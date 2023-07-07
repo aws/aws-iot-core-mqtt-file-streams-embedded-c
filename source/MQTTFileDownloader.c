@@ -11,9 +11,6 @@ License Info
 #include "MQTTFileDownloader.h"
 #include "core_json.h"
 
-/* Logging */
-#include "logging_levels.h"
-
 /* Logging configuration for the library. */
 #ifndef LIBRARY_LOG_NAME
 #define LIBRARY_LOG_NAME    "MqttFileDownloader"
@@ -120,8 +117,9 @@ static topicFilterContext_t xDataTopicFilterContext;
  /* NOTE: The format specifiers in this string are placeholders only; the lengths of these
   * strings are used to calculate buffer sizes.
   */
-static const char pCborStreamDataTopicTemplate[] = MQTT_API_THINGS "%s"MQTT_API_STREAMS "%s"MQTT_API_DATA_CBOR; /*!< Topic template to receive data over a stream. */
-static const char pCborGetStreamTopicTemplate[] = MQTT_API_THINGS "%s"MQTT_API_STREAMS "%s"MQTT_API_GET_CBOR;   /*!< Topic template to request next data over a stream. */
+/* Reserved for CBOR data type*/
+//static const char pCborStreamDataTopicTemplate[] = MQTT_API_THINGS "%s"MQTT_API_STREAMS "%s"MQTT_API_DATA_CBOR; /*!< Topic template to receive data over a stream. */
+//static const char pCborGetStreamTopicTemplate[] = MQTT_API_THINGS "%s"MQTT_API_STREAMS "%s"MQTT_API_GET_CBOR;   /*!< Topic template to request next data over a stream. */
 static const char pJsonStreamDataTopicTemplate[] = MQTT_API_THINGS "%s"MQTT_API_STREAMS "%s"MQTT_API_DATA_JSON; /*!< Topic template to receive data over a stream. */
 static const char pJsonGetStreamTopicTemplate[] = MQTT_API_THINGS "%s"MQTT_API_STREAMS "%s"MQTT_API_GET_JSON;   /*!< Topic template to request next data over a stream. */
 
@@ -192,10 +190,10 @@ uint8_t ucMqttFileDownloaderInit(MQTTContext_t* pxMQTTContext, char * pStreamNam
     uint16_t topicLen = 0;
     
     memset(pMqttDownloaderThingName, '\0', MAX_THINGNAME_LEN);
-    strncpy(pMqttDownloaderThingName, pThingName, strlen(pThingName));
+    memcpy(pMqttDownloaderThingName, pThingName, strlen(pThingName));
 
     memset(pMqttDownloaderStreamName, '\0', STREAM_NAME_MAX_LEN);
-    strncpy(pMqttDownloaderStreamName, pStreamName, strlen(pStreamName));
+    memcpy(pMqttDownloaderStreamName, pStreamName, strlen(pStreamName));
 
     /* Initializing DATA topic name */
     
@@ -218,11 +216,10 @@ uint8_t ucMqttFileDownloaderInit(MQTTContext_t* pxMQTTContext, char * pStreamNam
     topicLen = (uint16_t)stringBuilder( pRxStreamTopic,
                             sizeof(pRxStreamTopic), pDataTopicParts);
 
-    LogInfo( ("The Data topic is %s", pRxStreamTopic) );
-
+    printf("Data topic is %s\n", pRxStreamTopic);
+    
     assert((topicLen > 0U) && (topicLen < sizeof(pRxStreamTopic)));
 
-    
     /* Initializing Get Stream topic name */
     topicLen = 0;
     memset(pGetStreamTopic, '\0', TOPIC_JSON_GET_STREAM_BUFFER_SIZE);
@@ -243,7 +240,7 @@ uint8_t ucMqttFileDownloaderInit(MQTTContext_t* pxMQTTContext, char * pStreamNam
     topicLen = (uint16_t)stringBuilder(pGetStreamTopic,
         sizeof(pGetStreamTopic), pGetStreamTopicParts);
 
-    LogInfo(("Get Stream topic is %s", pGetStreamTopic));
+    printf("Get Stream topic is %s\n", pGetStreamTopic);
 
     assert((topicLen > 0U) && (topicLen < sizeof(pGetStreamTopic)));
     
@@ -297,45 +294,45 @@ void prvMQTTProcessIncomingPublish(MQTTPublishInfo_t* pxPublishInfo)
     assert(pxPublishInfo != NULL);
     
     /* Process incoming Publish. */
-    LogInfo(("Incoming QoS : %d\n", pxPublishInfo->qos));
+    printf("Incoming QoS : %d\n", pxPublishInfo->qos);
 
     /* Verify the received publish is for the we have subscribed to. */
     if ((pxPublishInfo->topicNameLength == strlen(pRxStreamTopic)) &&
         (0 == strncmp(pRxStreamTopic, pxPublishInfo->pTopicName, pxPublishInfo->topicNameLength)))
     {
-        LogInfo(("\r\nIncoming Publish Topic Name: %.*s matches subscribed topic.\r\n"
-            "Incoming Publish Message : %.*s\r\n",
+        printf("Incoming Publish Topic Length: %d Name: %s matches subscribed topic.\r\n"
+            "Incoming Publish Message length: %lu Message: %s\r\n",
             pxPublishInfo->topicNameLength,
             pxPublishInfo->pTopicName,
             pxPublishInfo->payloadLength,
-            pxPublishInfo->pPayload));
+            (char *)pxPublishInfo->pPayload);
         
         JSONStatus_t result;
         char dataQuery[] = "p";
         size_t dataQueryLength = sizeof(dataQuery) - 1;
-        char* dataValue;
+        const char* dataValue;
         size_t dataValueLength;
 
-        result = JSON_Search(pxPublishInfo->pPayload, pxPublishInfo->payloadLength, dataQuery, dataQueryLength,
-            &dataValue, &dataValueLength);
+        result = JSON_SearchConst(pxPublishInfo->pPayload, pxPublishInfo->payloadLength, dataQuery, dataQueryLength,
+            &dataValue, &dataValueLength, NULL);
     
         if (result == JSONSuccess)
         {
-            char save = dataValue[dataValueLength];
+            //char save = dataValue[dataValueLength];
             
-            dataValue[dataValueLength] = '\0';
+            //dataValue[dataValueLength] = '\0';
             
-            LogInfo(("Found: %s -> %s\n", dataQuery, dataValue));
+            printf("Found: %s -> %s\n", dataQuery, dataValue);
          
-            dataValue[dataValueLength] = save;
+            //dataValue[dataValueLength] = save;
         }
     
     }
     else
     {
-        LogInfo(("Incoming Publish Topic Name: %.*s does not match subscribed topic.\r\n",
+        printf("Incoming Publish Topic Name: %.*s does not match subscribed topic.\r\n",
             pxPublishInfo->topicNameLength,
-            pxPublishInfo->pTopicName));
+            pxPublishInfo->pTopicName);
     }
 }
 
@@ -345,7 +342,6 @@ void prvUpdateSubAckStatus(MQTTPacketInfo_t* pxPacketInfo)
     MQTTStatus_t xResult = MQTTSuccess;
     uint8_t* pucPayload = NULL;
     size_t ulSize = 0;
-    uint32_t ulTopicCount = 0U;
 
     xResult = MQTT_GetSubAckStatusCodes(pxPacketInfo, &pucPayload, &ulSize);
 
@@ -390,7 +386,6 @@ static bool prvMQTTSubscribeWithRetries(MQTTContext_t* pxMQTTContext, char* pTop
     uint8_t ucRetryCount = 0U;
     MQTTSubscribeInfo_t xMQTTSubscription[mqttFileDownloaderSubscribeTOPIC_COUNT];
     bool xIsSubscribeToTopic = false;
-    uint32_t ulTopicCount = 0U;
 
     (void)memset((void*)&xMQTTSubscription, 0x00, sizeof(xMQTTSubscription));
 
@@ -405,14 +400,14 @@ static bool prvMQTTSubscribeWithRetries(MQTTContext_t* pxMQTTContext, char* pTop
 
     do
     {
-        LogInfo(("Attempt to subscribe to the MQTT topic %s.\r\n", pTopicName));
+        printf("Attempt to subscribe to the MQTT topic %s.\r\n", pTopicName);
         xResult = MQTT_Subscribe(pxMQTTContext,
             xMQTTSubscription,
             sizeof(xMQTTSubscription) / sizeof(MQTTSubscribeInfo_t),
             usDataTopicSubscribePacketIdentifier);
         assert(xResult == MQTTSuccess);
 
-        LogInfo(("SUBSCRIBE sent for topic %s to broker.\n\n", pTopicName));
+        printf("SUBSCRIBE sent for topic %s to broker.\n\n", pTopicName);
 
         /* Process incoming packet from the broker.*/
         xResult = prvProcessLoopWithTimeout(pxMQTTContext, mqttFileDownloaderPROCESS_LOOP_TIMEOUT_MS);
@@ -425,9 +420,9 @@ static bool prvMQTTSubscribeWithRetries(MQTTContext_t* pxMQTTContext, char* pTop
         if (xDataTopicFilterContext.xSubAckStatus != MQTTSubAckFailure)
         {
             xIsSubscribeToTopic = true;
-            LogInfo(("Subscribed to the topic %s with maximum QoS %u.\r\n",
+            printf("Subscribed to the topic %s with maximum QoS %u.\r\n",
                                 xDataTopicFilterContext.pcTopicFilter,
-                                xDataTopicFilterContext.xSubAckStatus ) );
+                                xDataTopicFilterContext.xSubAckStatus );
             break;
         }
         ucRetryCount++;
