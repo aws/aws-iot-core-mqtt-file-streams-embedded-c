@@ -2,8 +2,8 @@
 #define MQTT_FILE_DOWNLOADER_H
 
 
- /* MQTT library includes. */
-#include "core_mqtt.h"
+#include <stdbool.h>
+#include <stdint.h>
 
  /**
   * Initializes the MQTT file downloader.
@@ -13,7 +13,7 @@
   * @param[in] pStreamName Stream name to download the file.
   * @param[in] pThingName Thing name of the Device.
   */
-uint8_t ucMqttFileDownloaderInit(MQTTContext_t * pxMQTTContext, char * pStreamName, char *pThingName);
+uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName);
 
 /**
  * Request the Data blocks from MQTT Streams.
@@ -24,10 +24,10 @@ uint8_t ucMqttFileDownloaderInit(MQTTContext_t * pxMQTTContext, char * pStreamNa
  * @param[in] usBlockOffset Block Offset.
  * @param[in] ulNumberOfBlocksRequested Number of Blocks requested per request.
  */
-uint8_t ucRequestDataBlock(MQTTContext_t* pxMQTTContext, uint16_t usFileId,
-                                                        uint32_t ulBlockSize,
-                                                        uint16_t usBlockOffset,
-                                                        uint32_t ulNumberOfBlocksRequested);
+uint8_t ucRequestDataBlock(uint16_t usFileId,
+                            uint32_t ulBlockSize,
+                            uint16_t usBlockOffset,
+                            uint32_t ulNumberOfBlocksRequested);
 
 /**
  * @brief Process incoming Publish message.
@@ -35,7 +35,10 @@ uint8_t ucRequestDataBlock(MQTTContext_t* pxMQTTContext, uint16_t usFileId,
  * @param[in] pxPublishInfo is a pointer to structure containing deserialized
  * Publish message.
  */
-void prvMQTTProcessIncomingPublish(MQTTPublishInfo_t* pxPublishInfo);
+bool mqttStreams_handleIncomingMessage( char * topic,
+                                        size_t topicLength,
+                                        uint8_t * message,
+                                        size_t messageLength );
 
 /**
  * @brief Function to update variable TopicFilterContext with status
@@ -44,7 +47,7 @@ void prvMQTTProcessIncomingPublish(MQTTPublishInfo_t* pxPublishInfo);
  *
  * @param[in] Server response to the subscription request.
  */
-void prvUpdateSubAckStatus(MQTTPacketInfo_t* pxPacketInfo);
+//void prvUpdateSubAckStatus(MQTTPacketInfo_t* pxPacketInfo);
 
 #endif // #ifndef MQTT_FILE_DOWNLOADER_H
 

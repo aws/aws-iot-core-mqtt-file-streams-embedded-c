@@ -3,9 +3,11 @@ License Info
  */
 
 /* Standard includes. */
-#include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 #include <assert.h>
 
 #include "MQTTFileDownloader.h"
@@ -54,8 +56,8 @@ static size_t stringBuilder(char* pBuffer, size_t bufferSizeBytes, const char* c
  *
  * @return Returns the return value of the last call to #MQTT_ProcessLoop.
  */
-static MQTTStatus_t prvProcessLoopWithTimeout(MQTTContext_t* pMqttContext,
-    uint32_t ulTimeoutMs);
+// static MQTTStatus_t prvProcessLoopWithTimeout(MQTTContext_t* pMqttContext,
+//     uint32_t ulTimeoutMs);
 
 /**
  * @brief Subscribes to the topic as specified in pTopicName.
@@ -64,43 +66,47 @@ static MQTTStatus_t prvProcessLoopWithTimeout(MQTTContext_t* pMqttContext,
  *
  * @param[in] pxMQTTContext MQTT context pointer.
  */
-static bool prvMQTTSubscribeWithRetries(MQTTContext_t* pxMQTTContext, char* pTopicName);
-
+//static bool prvMQTTSubscribeWithRetries(MQTTContext_t* pxMQTTContext, char* pTopicName);
+extern bool mqttSubscribe( char * topic, size_t topicLength );
 
 /**
  * @brief Publishes a message mqttexampleMESSAGE on mqttexampleTOPIC topic.
  *
  * @param[in] pxMQTTContext MQTT context pointer.
  */
-void prvMQTTPublishToTopic(MQTTContext_t* pxMQTTContext, char* pTopicName, char* pMessage);
+//void prvMQTTPublishToTopic(MQTTContext_t* pxMQTTContext, char* pTopicName, char* pMessage);
+extern bool mqttPublish( char * topic,
+                  size_t topicLength,
+                  uint8_t * message,
+                  size_t messageLength );
 
 
  /**
   * @brief Packet Identifier generated when Subscribe request was sent to the broker;
   * it is used to match received Subscribe ACK to the transmitted Subscribe packet.
   */
-static uint16_t usDataTopicSubscribePacketIdentifier;
+//static uint16_t usDataTopicSubscribePacketIdentifier;
 
 /**
  * @brief Packet Identifier generated when Publish request was sent to the broker;
  * it is used to match received Publish ACK to the transmitted Publish packet.
  */
-static uint16_t usGetDataPublishPacketIdentifier;
+//static uint16_t usGetDataPublishPacketIdentifier;
 
 /**
  * @brief A pair containing a topic filter and its SUBACK status.
  */
-typedef struct topicFilterContext
-{
-    const char* pcTopicFilter;
-    MQTTSubAckStatus_t xSubAckStatus;
-} topicFilterContext_t;
+// typedef struct topicFilterContext
+// {
+//     const char* pcTopicFilter;
+//     MQTTSubAckStatus_t xSubAckStatus;
+// } topicFilterContext_t;
 
 /**
  * @brief An array containing the context of a SUBACK; the SUBACK status
  * of a filter is updated when the event callback processes a SUBACK.
  */
-static topicFilterContext_t xDataTopicFilterContext;
+//static topicFilterContext_t xDataTopicFilterContext;
 
 /**
  *  @brief Topic strings used by the MQTT downloader.
@@ -185,7 +191,7 @@ static size_t stringBuilder(char* pBuffer, size_t bufferSizeBytes, const char* c
     return curLen;
 }
 
-uint8_t ucMqttFileDownloaderInit(MQTTContext_t* pxMQTTContext, char * pStreamName, char *pThingName)
+uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName)
 {
     uint16_t topicLen = 0;
     
@@ -245,19 +251,20 @@ uint8_t ucMqttFileDownloaderInit(MQTTContext_t* pxMQTTContext, char * pStreamNam
     assert((topicLen > 0U) && (topicLen < sizeof(pGetStreamTopic)));
     
     /* Initalizing the Subscribe Act status */
-    xDataTopicFilterContext.pcTopicFilter = pRxStreamTopic;
-    xDataTopicFilterContext.xSubAckStatus = MQTTSubAckFailure;
+    // xDataTopicFilterContext.pcTopicFilter = pRxStreamTopic;
+    // xDataTopicFilterContext.xSubAckStatus = MQTTSubAckFailure;
     
-    prvMQTTSubscribeWithRetries(pxMQTTContext, pRxStreamTopic);
+    //prvMQTTSubscribeWithRetries(pxMQTTContext, pRxStreamTopic);
+    mqttSubscribe(pRxStreamTopic, topicLen);
 
     return 0;
 }
 
 
-uint8_t ucRequestDataBlock(MQTTContext_t* pxMQTTContext, uint16_t usFileId,
-                                                        uint32_t ulBlockSize,
-                                                        uint16_t usBlockOffset,
-                                                        uint32_t ulNumberOfBlocksRequested)
+uint8_t ucRequestDataBlock(uint16_t usFileId,
+                            uint32_t ulBlockSize,
+                            uint16_t usBlockOffset,
+                            uint32_t ulNumberOfBlocksRequested)
 {
     char getStreamRequest[GET_STREAM_REQUEST_BUFFER_SIZE];
 
@@ -284,37 +291,38 @@ uint8_t ucRequestDataBlock(MQTTContext_t* pxMQTTContext, uint16_t usFileId,
                                     ulNumberOfBlocksRequested
                                 );
 
-    prvMQTTPublishToTopic(pxMQTTContext, pGetStreamTopic, getStreamRequest);
+    mqttPublish(pGetStreamTopic, strlen(pGetStreamTopic), (uint8_t *)getStreamRequest, strlen(getStreamRequest));
 
     return 0;
 }
 
-void prvMQTTProcessIncomingPublish(MQTTPublishInfo_t* pxPublishInfo)
+bool mqttStreams_handleIncomingMessage( char * topic,
+                                        size_t topicLength,
+                                        uint8_t * message,
+                                        size_t messageLength )
 {
-    assert(pxPublishInfo != NULL);
-    
     /* Process incoming Publish. */
-    printf("Incoming QoS : %d\n", pxPublishInfo->qos);
+    printf("MQTT streams handling incoming message \n");
 
     /* Verify the received publish is for the we have subscribed to. */
-    if ((pxPublishInfo->topicNameLength == strlen(pRxStreamTopic)) &&
-        (0 == strncmp(pRxStreamTopic, pxPublishInfo->pTopicName, pxPublishInfo->topicNameLength)))
+    if ((topicLength == strlen(pRxStreamTopic)) &&
+        (0 == strncmp(pRxStreamTopic, topic, topicLength)))
     {
-        printf("Incoming Publish Topic Length: %d Name: %s matches subscribed topic.\r\n"
+        printf("Incoming Publish Topic Length: %lu Name: %s matches subscribed topic.\r\n"
             "Incoming Publish Message length: %lu Message: %s\r\n",
-            pxPublishInfo->topicNameLength,
-            pxPublishInfo->pTopicName,
-            pxPublishInfo->payloadLength,
-            (char *)pxPublishInfo->pPayload);
+            topicLength,
+            topic,
+            messageLength,
+            (char *)message);
         
         JSONStatus_t result;
         char dataQuery[] = "p";
         size_t dataQueryLength = sizeof(dataQuery) - 1;
-        const char* dataValue;
+        char* dataValue;
         size_t dataValueLength;
 
-        result = JSON_SearchConst(pxPublishInfo->pPayload, pxPublishInfo->payloadLength, dataQuery, dataQueryLength,
-            &dataValue, &dataValueLength, NULL);
+        result = JSON_Search((char *)message, messageLength, dataQuery, dataQueryLength,
+            &dataValue, &dataValueLength);
     
         if (result == JSONSuccess)
         {
@@ -323,134 +331,136 @@ void prvMQTTProcessIncomingPublish(MQTTPublishInfo_t* pxPublishInfo)
             //dataValue[dataValueLength] = '\0';
             
             printf("Found: %s -> %s\n", dataQuery, dataValue);
-         
+
+            return true;
             //dataValue[dataValueLength] = save;
         }
     
     }
     else
     {
-        printf("Incoming Publish Topic Name: %.*s does not match subscribed topic.\r\n",
-            pxPublishInfo->topicNameLength,
-            pxPublishInfo->pTopicName);
+        printf("Incoming Publish Topic Name: %s does not match subscribed topic.\r\n",
+            topic);
     }
+
+    return false;
 }
 
 
-void prvUpdateSubAckStatus(MQTTPacketInfo_t* pxPacketInfo)
-{
-    MQTTStatus_t xResult = MQTTSuccess;
-    uint8_t* pucPayload = NULL;
-    size_t ulSize = 0;
+// void prvUpdateSubAckStatus(MQTTPacketInfo_t* pxPacketInfo)
+// {
+//     MQTTStatus_t xResult = MQTTSuccess;
+//     uint8_t* pucPayload = NULL;
+//     size_t ulSize = 0;
 
-    xResult = MQTT_GetSubAckStatusCodes(pxPacketInfo, &pucPayload, &ulSize);
+//     xResult = MQTT_GetSubAckStatusCodes(pxPacketInfo, &pucPayload, &ulSize);
 
-    assert(xResult == MQTTSuccess);
+//     assert(xResult == MQTTSuccess);
 
  
-    xDataTopicFilterContext.xSubAckStatus = pucPayload[0];
+//     xDataTopicFilterContext.xSubAckStatus = pucPayload[0];
 
-}
-
-
-static MQTTStatus_t prvProcessLoopWithTimeout(MQTTContext_t* pMqttContext,
-    uint32_t ulTimeoutMs)
-{
-    uint32_t ulMqttProcessLoopTimeoutTime;
-    uint32_t ulCurrentTime;
-
-    MQTTStatus_t eMqttStatus = MQTTSuccess;
-
-    ulCurrentTime = pMqttContext->getTime();
-    ulMqttProcessLoopTimeoutTime = ulCurrentTime + ulTimeoutMs;
-
-    while ((ulCurrentTime < ulMqttProcessLoopTimeoutTime) &&
-        (eMqttStatus == MQTTSuccess || eMqttStatus == MQTTNeedMoreBytes))
-    {
-        eMqttStatus = MQTT_ProcessLoop(pMqttContext);
-        ulCurrentTime = pMqttContext->getTime();
-    }
-
-    if (eMqttStatus == MQTTNeedMoreBytes)
-    {
-        eMqttStatus = MQTTSuccess;
-    }
-
-    return eMqttStatus;
-}
+// }
 
 
-static bool prvMQTTSubscribeWithRetries(MQTTContext_t* pxMQTTContext, char* pTopicName)
-{
-    MQTTStatus_t xResult = MQTTSuccess;
-    uint8_t ucRetryCount = 0U;
-    MQTTSubscribeInfo_t xMQTTSubscription[mqttFileDownloaderSubscribeTOPIC_COUNT];
-    bool xIsSubscribeToTopic = false;
+// static MQTTStatus_t prvProcessLoopWithTimeout(MQTTContext_t* pMqttContext,
+//     uint32_t ulTimeoutMs)
+// {
+//     uint32_t ulMqttProcessLoopTimeoutTime;
+//     uint32_t ulCurrentTime;
 
-    (void)memset((void*)&xMQTTSubscription, 0x00, sizeof(xMQTTSubscription));
+//     MQTTStatus_t eMqttStatus = MQTTSuccess;
 
-    /* Get a unique packet id. */
-    usDataTopicSubscribePacketIdentifier = MQTT_GetPacketId(pxMQTTContext);
+//     ulCurrentTime = pMqttContext->getTime();
+//     ulMqttProcessLoopTimeoutTime = ulCurrentTime + ulTimeoutMs;
 
-    /* Subcribe to the topic passed as input*/
-    xMQTTSubscription[0].qos = MQTTQoS1;
-    xMQTTSubscription[0].pTopicFilter = pTopicName;
-    xMQTTSubscription[0].topicFilterLength = (uint16_t)strlen(pTopicName);
+//     while ((ulCurrentTime < ulMqttProcessLoopTimeoutTime) &&
+//         (eMqttStatus == MQTTSuccess || eMqttStatus == MQTTNeedMoreBytes))
+//     {
+//         eMqttStatus = MQTT_ProcessLoop(pMqttContext);
+//         ulCurrentTime = pMqttContext->getTime();
+//     }
+
+//     if (eMqttStatus == MQTTNeedMoreBytes)
+//     {
+//         eMqttStatus = MQTTSuccess;
+//     }
+
+//     return eMqttStatus;
+// }
 
 
-    do
-    {
-        printf("Attempt to subscribe to the MQTT topic %s.\r\n", pTopicName);
-        xResult = MQTT_Subscribe(pxMQTTContext,
-            xMQTTSubscription,
-            sizeof(xMQTTSubscription) / sizeof(MQTTSubscribeInfo_t),
-            usDataTopicSubscribePacketIdentifier);
-        assert(xResult == MQTTSuccess);
+// static bool prvMQTTSubscribeWithRetries(MQTTContext_t* pxMQTTContext, char* pTopicName)
+// {
+//     MQTTStatus_t xResult = MQTTSuccess;
+//     uint8_t ucRetryCount = 0U;
+//     MQTTSubscribeInfo_t xMQTTSubscription[mqttFileDownloaderSubscribeTOPIC_COUNT];
+//     bool xIsSubscribeToTopic = false;
 
-        printf("SUBSCRIBE sent for topic %s to broker.\n\n", pTopicName);
+//     (void)memset((void*)&xMQTTSubscription, 0x00, sizeof(xMQTTSubscription));
 
-        /* Process incoming packet from the broker.*/
-        xResult = prvProcessLoopWithTimeout(pxMQTTContext, mqttFileDownloaderPROCESS_LOOP_TIMEOUT_MS);
-        assert(xResult == MQTTSuccess);
+//     /* Get a unique packet id. */
+//     usDataTopicSubscribePacketIdentifier = MQTT_GetPacketId(pxMQTTContext);
 
-        /* Reset the flag before checking suback responses. */
-        xIsSubscribeToTopic = false;
+//     /* Subcribe to the topic passed as input*/
+//     xMQTTSubscription[0].qos = MQTTQoS1;
+//     xMQTTSubscription[0].pTopicFilter = pTopicName;
+//     xMQTTSubscription[0].topicFilterLength = (uint16_t)strlen(pTopicName);
 
-        /* Check if recent subscription request has been accepted */
-        if (xDataTopicFilterContext.xSubAckStatus != MQTTSubAckFailure)
-        {
-            xIsSubscribeToTopic = true;
-            printf("Subscribed to the topic %s with maximum QoS %u.\r\n",
-                                xDataTopicFilterContext.pcTopicFilter,
-                                xDataTopicFilterContext.xSubAckStatus );
-            break;
-        }
-        ucRetryCount++;
+
+//     do
+//     {
+//         printf("Attempt to subscribe to the MQTT topic %s.\r\n", pTopicName);
+//         xResult = MQTT_Subscribe(pxMQTTContext,
+//             xMQTTSubscription,
+//             sizeof(xMQTTSubscription) / sizeof(MQTTSubscribeInfo_t),
+//             usDataTopicSubscribePacketIdentifier);
+//         assert(xResult == MQTTSuccess);
+
+//         printf("SUBSCRIBE sent for topic %s to broker.\n\n", pTopicName);
+
+//         /* Process incoming packet from the broker.*/
+//         xResult = prvProcessLoopWithTimeout(pxMQTTContext, mqttFileDownloaderPROCESS_LOOP_TIMEOUT_MS);
+//         assert(xResult == MQTTSuccess);
+
+//         /* Reset the flag before checking suback responses. */
+//         xIsSubscribeToTopic = false;
+
+//         /* Check if recent subscription request has been accepted */
+//         if (xDataTopicFilterContext.xSubAckStatus != MQTTSubAckFailure)
+//         {
+//             xIsSubscribeToTopic = true;
+//             printf("Subscribed to the topic %s with maximum QoS %u.\r\n",
+//                                 xDataTopicFilterContext.pcTopicFilter,
+//                                 xDataTopicFilterContext.xSubAckStatus );
+//             break;
+//         }
+//         ucRetryCount++;
     
-    } while ((xIsSubscribeToTopic == false) && (ucRetryCount < mqttFileDownloaderSubscribeRETRY_COUNT));
+//     } while ((xIsSubscribeToTopic == false) && (ucRetryCount < mqttFileDownloaderSubscribeRETRY_COUNT));
 
-    return xIsSubscribeToTopic;
-}
+//     return xIsSubscribeToTopic;
+// }
 
-void prvMQTTPublishToTopic(MQTTContext_t* pxMQTTContext, char* pTopicName, char* pMessage)
-{
-    MQTTStatus_t xResult;
-    MQTTPublishInfo_t xMQTTPublishInfo;
+// void prvMQTTPublishToTopic(MQTTContext_t* pxMQTTContext, char* pTopicName, char* pMessage)
+// {
+//     MQTTStatus_t xResult;
+//     MQTTPublishInfo_t xMQTTPublishInfo;
 
-    (void)memset((void*)&xMQTTPublishInfo, 0x00, sizeof(xMQTTPublishInfo));
+//     (void)memset((void*)&xMQTTPublishInfo, 0x00, sizeof(xMQTTPublishInfo));
 
-    xMQTTPublishInfo.qos = MQTTQoS1;
-    xMQTTPublishInfo.retain = false;
-    xMQTTPublishInfo.pTopicName = pTopicName;
-    xMQTTPublishInfo.topicNameLength = (uint16_t)strlen(pTopicName);
-    xMQTTPublishInfo.pPayload = pMessage;
-    xMQTTPublishInfo.payloadLength = strlen(pMessage);
+//     xMQTTPublishInfo.qos = MQTTQoS1;
+//     xMQTTPublishInfo.retain = false;
+//     xMQTTPublishInfo.pTopicName = pTopicName;
+//     xMQTTPublishInfo.topicNameLength = (uint16_t)strlen(pTopicName);
+//     xMQTTPublishInfo.pPayload = pMessage;
+//     xMQTTPublishInfo.payloadLength = strlen(pMessage);
 
-    /* Get a unique packet id. */
-    usGetDataPublishPacketIdentifier = MQTT_GetPacketId(pxMQTTContext);
+//     /* Get a unique packet id. */
+//     usGetDataPublishPacketIdentifier = MQTT_GetPacketId(pxMQTTContext);
 
-    /* Send PUBLISH packet */
-    xResult = MQTT_Publish(pxMQTTContext, &xMQTTPublishInfo, usGetDataPublishPacketIdentifier);
+//     /* Send PUBLISH packet */
+//     xResult = MQTT_Publish(pxMQTTContext, &xMQTTPublishInfo, usGetDataPublishPacketIdentifier);
 
-    assert(xResult == MQTTSuccess);
-}
+//     assert(xResult == MQTTSuccess);
+// }
