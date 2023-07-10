@@ -12,6 +12,7 @@ License Info
 
 #include "MQTTFileDownloader.h"
 #include "MQTTFileDownloader_base64.h"
+#include "MQTTFileDownloader_cbor.h"
 #include "core_json.h"
 
 /* Logging configuration for the library. */
@@ -166,6 +167,10 @@ static char pRxStreamTopic[TOPIC_JSON_STREAM_DATA_BUFFER_SIZE];
  * Buffer to store the topic generated for requesting data stream. 
  */
 static char pGetStreamTopic[TOPIC_JSON_GET_STREAM_BUFFER_SIZE];      
+/*
+ * MqttDownloader data type configured.
+*/
+static uint8_t ucMqttDownloaderDataType;
 
 
 static size_t stringBuilder(char* pBuffer, size_t bufferSizeBytes, const char* const strings[])
@@ -193,7 +198,7 @@ static size_t stringBuilder(char* pBuffer, size_t bufferSizeBytes, const char* c
     return curLen;
 }
 
-uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName)
+uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName, uint8_t ucDataType)
 {
     uint16_t topicLen = 0;
     
@@ -202,6 +207,8 @@ uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName)
 
     memset(pMqttDownloaderStreamName, '\0', STREAM_NAME_MAX_LEN);
     memcpy(pMqttDownloaderStreamName, pStreamName, strlen(pStreamName));
+
+    ucMqttDownloaderDataType = ucDataType;
 
     /* Initializing DATA topic name */
     
@@ -214,12 +221,19 @@ uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName)
         NULL, /* Thing Name not available at compile time, initialized below. */
         MQTT_API_STREAMS,
         NULL, /* Stream Name not available at compile time, initialized below. */
-        MQTT_API_DATA_JSON,
+        NULL,
         NULL
     };
 
     pDataTopicParts[1] = (const char*)pMqttDownloaderThingName;
     pDataTopicParts[3] = (const char*)pMqttDownloaderStreamName;
+
+    if (ucDataType == DATA_TYPE_JSON) {
+        pDataTopicParts[4] = MQTT_API_DATA_JSON;
+    } 
+    else {
+        pDataTopicParts[4] = MQTT_API_DATA_CBOR;
+    }
 
     topicLen = (uint16_t)stringBuilder( pRxStreamTopic,
                             sizeof(pRxStreamTopic), pDataTopicParts);
@@ -238,13 +252,20 @@ uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName)
         NULL, /* Thing Name not available at compile time, initialized below. */
         MQTT_API_STREAMS,
         NULL, /* Stream Name not available at compile time, initialized below. */
-        MQTT_API_GET_JSON,
+        NULL,
         NULL
     };
 
     pGetStreamTopicParts[1] = (const char*)pMqttDownloaderThingName;
     pGetStreamTopicParts[3] = (const char*)pMqttDownloaderStreamName;
 
+    if (ucDataType == DATA_TYPE_JSON) {
+        pGetStreamTopicParts[4] = MQTT_API_GET_JSON;
+    } 
+    else {
+        pGetStreamTopicParts[4] = MQTT_API_GET_CBOR;
+    }
+    
     topicLen = (uint16_t)stringBuilder(pGetStreamTopic,
         sizeof(pGetStreamTopic), pGetStreamTopicParts);
 
@@ -252,11 +273,6 @@ uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName)
 
     assert((topicLen > 0U) && (topicLen < sizeof(pGetStreamTopic)));
     
-    /* Initalizing the Subscribe Act status */
-    // xDataTopicFilterContext.pcTopicFilter = pRxStreamTopic;
-    // xDataTopicFilterContext.xSubAckStatus = MQTTSubAckFailure;
-    
-    //prvMQTTSubscribeWithRetries(pxMQTTContext, pRxStreamTopic);
     mqttSubscribe(pRxStreamTopic, topicLen);
 
     return 0;
@@ -277,8 +293,8 @@ uint8_t ucRequestDataBlock(uint16_t usFileId,
      * 
      *   "{ \"s\" : 1, \"f\": 1, \"l\": 256, \"o\": 0, \"n\": 1 }";
     */
-
-    snprintf(getStreamRequest, GET_STREAM_REQUEST_BUFFER_SIZE,
+    if (ucMqttDownloaderDataType == DATA_TYPE_JSON) {
+        snprintf(getStreamRequest, GET_STREAM_REQUEST_BUFFER_SIZE,
                                 "{"
                                     "\"s\": 1,"
                                     "\"f\": %u,"
@@ -292,8 +308,23 @@ uint8_t ucRequestDataBlock(uint16_t usFileId,
                                     usBlockOffset,
                                     ulNumberOfBlocksRequested
                                 );
-
-    mqttPublish(pGetStreamTopic, strlen(pGetStreamTopic), (uint8_t *)getStreamRequest, strlen(getStreamRequest));
+        mqttPublish(pGetStreamTopic, strlen(pGetStreamTopic), (uint8_t *)getStreamRequest, strlen(getStreamRequest));
+    }
+    else {
+        size_t encodedMessageSize = 0;
+        
+        OTA_CBOR_Encode_GetStreamRequestMessage( (uint8_t *) getStreamRequest,
+                                              GET_STREAM_REQUEST_BUFFER_SIZE,
+                                              &encodedMessageSize,
+                                              "rdy",
+                                              usFileId,
+                                              ulBlockSize,
+                                              usBlockOffset,
+                                              (const uint8_t *)"MQ==",
+                                              strlen("MQ=="),
+                                              ulNumberOfBlocksRequested );
+        mqttPublish(pGetStreamTopic, strlen(pGetStreamTopic), (uint8_t *)getStreamRequest, encodedMessageSize);
+    }
 
     return 0;
 }
@@ -310,65 +341,94 @@ bool mqttStreams_handleIncomingMessage( char * topic,
     if ((topicLength == strlen(pRxStreamTopic)) &&
         (0 == strncmp(pRxStreamTopic, topic, topicLength)))
     {
-        printf("Incoming Publish Topic Length: %lu Name: %s matches subscribed topic.\r\n"
-            "Incoming Publish Message length: %lu Message: %s\r\n",
+        printf("Incoming Publish Topic Length: %lu Name: %.*s matches subscribed topic.\r\n"
+            "Incoming Publish Message length: %lu Message: %.*s\r\n",
             topicLength,
+            (int)topicLength,
             topic,
             messageLength,
+            (int) messageLength,
             (char *)message);
         
-        JSONStatus_t result;
-        char dataQuery[] = "p";
-        size_t dataQueryLength = sizeof(dataQuery) - 1;
-        char* dataValue;
-        size_t dataValueLength;
-
-        result = JSON_Search((char *)message, messageLength, dataQuery, dataQueryLength,
-            &dataValue, &dataValueLength);
-    
-        if (result == JSONSuccess)
+        char decodedData[1024];
+        size_t decodedDataLength = 0;
+        memset(decodedData, '\0', sizeof(char) * 1024);
+        MqttFileDownloaderDataBlockInfo_t dataBlock;
+        
+        if (ucMqttDownloaderDataType == DATA_TYPE_JSON) 
         {
-            printf("Found: %s -> %s\n", dataQuery, dataValue);
+            JSONStatus_t result;
+            char dataQuery[] = "p";
+            size_t dataQueryLength = sizeof(dataQuery) - 1;
+            char* dataValue;
+            size_t dataValueLength;
 
-            char decodedData[1024];
-            size_t decodedDataLength = 0;
-            Base64Status_t base64Status = Base64Success;
-
-            memset(decodedData, '\0', sizeof(char) * 1024);
-
-            base64Status = base64Decode((uint8_t *) decodedData, 1024, &decodedDataLength, (const uint8_t *) dataValue, dataValueLength);
-
-            if (base64Status != Base64Success)
+            result = JSON_Search((char *)message, messageLength, dataQuery, dataQueryLength,
+                &dataValue, &dataValueLength);
+        
+            if (result == JSONSuccess)
             {
-                /* Stop processing on error. */
-                printf("Failed to decode Base64 data: "
-                    "base64Decode returned error: "
-                    "error=%d",
-                    (int)base64Status);
-            }
-            else
-            {
-                printf("Data value length %lu actual len %lu", dataValueLength, decodedDataLength);
-                printf("Extracted: [ %s ]", decodedData);
+                printf("Found: %s -> %s\n", dataQuery, dataValue);
 
+                Base64Status_t base64Status = Base64Success;
+
+                base64Status = base64Decode((uint8_t *) decodedData, 1024, &decodedDataLength, (const uint8_t *) dataValue, dataValueLength);
+
+                if (base64Status != Base64Success)
+                {
+                    /* Stop processing on error. */
+                    printf("Failed to decode Base64 data: "
+                        "base64Decode returned error: "
+                        "error=%d",
+                        (int)base64Status);
+                        return true;
+                }
+                else
+                {
+                    printf("Data value length: %lu actual len: %lu \n", dataValueLength, decodedDataLength);
+                    printf("Extracted: [ %s ]\n", decodedData);
+                    dataBlock.payload = (uint8_t *) decodedData;
+                    dataBlock.payloadLength = decodedDataLength;
+                }
+            }    
+        } 
+        else 
+        {
+            int32_t pFileId = 0;
+            int32_t pBlockId = 0;
+            int32_t pBlockSize = 0;
+            uint8_t *pPayload = (uint8_t *)decodedData;
+            size_t pPayloadSize = 1024;
+            bool cborDecodeRet = false;
+            cborDecodeRet = OTA_CBOR_Decode_GetStreamResponseMessage( message,
+                                                              messageLength,
+                                                              &pFileId,
+                                                              &pBlockId,   /* CBOR requires pointer to int and our block indices never exceed 31 bits. */
+                                                              &pBlockSize, /* CBOR requires pointer to int and our block sizes never exceed 31 bits. */
+                                                              &pPayload,   /* This payload gets malloc'd by OTA_CBOR_Decode_GetStreamResponseMessage(). We must free it. */
+                                                              &pPayloadSize );
+
+            if( cborDecodeRet == true )
+            {
+                //printf("CBor: payload length: %lu\n", pPayloadSize);
+                dataBlock.payload = (uint8_t *) pPayload;
+                dataBlock.payloadLength = pPayloadSize;
+            } else {
+                printf("Decoding CBOR failed \n");
             }
+        } 
             
-            MqttFileDownloaderDataBlockInfo_t dataBlock;
-            dataBlock.payload = (uint8_t *) decodedData;
-            dataBlock.payloadLength = decodedDataLength;
 
-            otaDemo_handleMqttStreamsBlockArrived( &dataBlock );
-            return true;
-        }
-    
+        otaDemo_handleMqttStreamsBlockArrived( &dataBlock );
     }
     else
     {
         printf("Incoming Publish Topic Name: %s does not match subscribed topic.\r\n",
             topic);
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 

@@ -6,6 +6,14 @@
 #include <stdint.h>
 
 /*
+ * Enum contains all the data types supported.
+*/
+enum DataType {
+  DATA_TYPE_JSON,
+  DATA_TYPE_CBOR
+};
+
+/*
  * Structure to contain the data block information. 
 */
 typedef struct MqttFileDownloaderDataBlockInfo {
@@ -21,7 +29,7 @@ typedef struct MqttFileDownloaderDataBlockInfo {
   * @param[in] pStreamName Stream name to download the file.
   * @param[in] pThingName Thing name of the Device.
   */
-uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName);
+uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName, uint8_t ucDataType);
 
 /**
  * Request the Data blocks from MQTT Streams.
