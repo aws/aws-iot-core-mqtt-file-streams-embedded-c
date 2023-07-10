@@ -11,6 +11,7 @@ License Info
 #include <assert.h>
 
 #include "MQTTFileDownloader.h"
+#include "MQTTFileDownloader_base64.h"
 #include "core_json.h"
 
 /* Logging configuration for the library. */
@@ -327,14 +328,35 @@ bool mqttStreams_handleIncomingMessage( char * topic,
     
         if (result == JSONSuccess)
         {
-            MqttFileDownloaderDataBlockInfo_t dataBlock;
-            dataBlock.payload = (uint8_t *) dataValue;
-            dataBlock.payloadLength = dataValueLength;
-            //char save = dataValue[dataValueLength];
-            
-            //dataValue[dataValueLength] = '\0';
-            
             printf("Found: %s -> %s\n", dataQuery, dataValue);
+
+            char decodedData[1024];
+            size_t decodedDataLength = 0;
+            Base64Status_t base64Status = Base64Success;
+
+            memset(decodedData, '\0', sizeof(char) * 1024);
+
+            base64Status = base64Decode((uint8_t *) decodedData, 1024, &decodedDataLength, (const uint8_t *) dataValue, dataValueLength);
+
+            if (base64Status != Base64Success)
+            {
+                /* Stop processing on error. */
+                printf("Failed to decode Base64 data: "
+                    "base64Decode returned error: "
+                    "error=%d",
+                    (int)base64Status);
+            }
+            else
+            {
+                printf("Data value length %lu actual len %lu", dataValueLength, decodedDataLength);
+                printf("Extracted: [ %s ]", decodedData);
+
+            }
+            
+            MqttFileDownloaderDataBlockInfo_t dataBlock;
+            dataBlock.payload = (uint8_t *) decodedData;
+            dataBlock.payloadLength = decodedDataLength;
+
             otaDemo_handleMqttStreamsBlockArrived( &dataBlock );
             return true;
         }
