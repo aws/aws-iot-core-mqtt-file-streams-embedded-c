@@ -80,6 +80,7 @@ extern bool mqttPublish( char * topic,
                   uint8_t * message,
                   size_t messageLength );
 
+extern void otaDemo_handleMqttStreamsBlockArrived( MqttFileDownloaderDataBlockInfo_t *dataBlock );
 
  /**
   * @brief Packet Identifier generated when Subscribe request was sent to the broker;
@@ -326,14 +327,16 @@ bool mqttStreams_handleIncomingMessage( char * topic,
     
         if (result == JSONSuccess)
         {
+            MqttFileDownloaderDataBlockInfo_t dataBlock;
+            dataBlock.payload = (uint8_t *) dataValue;
+            dataBlock.payloadLength = dataValueLength;
             //char save = dataValue[dataValueLength];
             
             //dataValue[dataValueLength] = '\0';
             
             printf("Found: %s -> %s\n", dataQuery, dataValue);
-
+            otaDemo_handleMqttStreamsBlockArrived( &dataBlock );
             return true;
-            //dataValue[dataValueLength] = save;
         }
     
     }

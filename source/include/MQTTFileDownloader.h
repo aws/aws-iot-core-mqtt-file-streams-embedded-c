@@ -5,6 +5,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/*
+ * Structure to contain the data block information. 
+*/
+typedef struct MqttFileDownloaderDataBlockInfo {
+    uint8_t *payload;
+    size_t payloadLength;
+} MqttFileDownloaderDataBlockInfo_t;
+
  /**
   * Initializes the MQTT file downloader.
   * Creates the topic name the DATA and Get Stream Data topics
