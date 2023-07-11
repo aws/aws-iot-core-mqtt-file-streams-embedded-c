@@ -198,7 +198,7 @@ static size_t stringBuilder(char* pBuffer, size_t bufferSizeBytes, const char* c
     return curLen;
 }
 
-uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName, uint8_t ucDataType)
+uint8_t ucMqttFileDownloaderInit(char * pStreamName, size_t streamNameLength, char *pThingName, uint8_t ucDataType)
 {
     uint16_t topicLen = 0;
     
@@ -206,7 +206,7 @@ uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName, uint8_t u
     memcpy(pMqttDownloaderThingName, pThingName, strlen(pThingName));
 
     memset(pMqttDownloaderStreamName, '\0', STREAM_NAME_MAX_LEN);
-    memcpy(pMqttDownloaderStreamName, pStreamName, strlen(pStreamName));
+    memcpy(pMqttDownloaderStreamName, pStreamName, streamNameLength);
 
     ucMqttDownloaderDataType = ucDataType;
 

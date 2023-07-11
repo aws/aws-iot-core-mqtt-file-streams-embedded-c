@@ -29,7 +29,7 @@ typedef struct MqttFileDownloaderDataBlockInfo {
   * @param[in] pStreamName Stream name to download the file.
   * @param[in] pThingName Thing name of the Device.
   */
-uint8_t ucMqttFileDownloaderInit(char * pStreamName, char *pThingName, uint8_t ucDataType);
+uint8_t ucMqttFileDownloaderInit(char * pStreamName, size_t streamNameLength, char *pThingName, uint8_t ucDataType);
 
 /**
  * Request the Data blocks from MQTT Streams.
