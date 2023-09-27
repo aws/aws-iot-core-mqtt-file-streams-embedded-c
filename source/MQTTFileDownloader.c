@@ -8,6 +8,12 @@
  */
 
 /* Standard includes. */
+
+/**
+ * @file MQTTFileDownloader.c
+ * @brief CBOR encode/decode routines for AWS IoT Over-the-Air updates.
+ */
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>

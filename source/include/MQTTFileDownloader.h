@@ -45,54 +45,49 @@
 #define TOPIC_GET_STREAM_BUFFER_SIZE \
     ( TOPIC_COMMON_PARTS_LEN + CONST_STRLEN( MQTT_API_GET_CBOR ) )
 
-#define GET_STREAM_REQUEST_BUFFER_SIZE       256U
-/*
- * Configure the Maximum size of the data payload.
+/**
+ * @ingroup mqtt_file_downloader_const_types
+ * @brief Configure the Maximum size of the data payload.
  */
 #define mqttFileDownloader_CONFIG_BLOCK_SIZE 256U
-/*
+
+/**
+ * @ingroup mqtt_file_downloader_enum_types
  * @brief  MQTT File Downloader return codes.
  */
 typedef enum
 {
-    MQTTFileDownloaderSuccess,
-    MQTTFileDownloaderBadParameter,
-    MQTTFileDownloaderNotInitialized,
-    MQTTFileDownloaderInitFailed,
-    MQTTFileDownloaderSubscribeFailed,
-    MQTTFileDownloaderPublishFailed,
-    MQTTFileDownloaderDataDecodingFailed
+    MQTTFileDownloaderSuccess,                  /**< Success. */
+    MQTTFileDownloaderBadParameter,             /**< Bad Parameter. */
+    MQTTFileDownloaderNotInitialized,           /**< Downloader not initalized. */
+    MQTTFileDownloaderInitFailed,               /**< Downloader init failed. */
+    MQTTFileDownloaderSubscribeFailed,          /**< MQTT subscribe failed. */
+    MQTTFileDownloaderPublishFailed,            /**< MQTT publish failed. */
+    MQTTFileDownloaderDataDecodingFailed        /**< MQTT data decoding failed. */
 } MQTTFileDownloaderStatus_t;
 
-/*
- * Enum contains all the data types supported.
+/**
+ * @ingroup mqtt_file_downloader_enum_types
+ * @brief contains all the data types supported.
  */
 typedef enum
 {
-    DATA_TYPE_JSON,
-    DATA_TYPE_CBOR
+    DATA_TYPE_JSON,     /**< JSON data type. */
+    DATA_TYPE_CBOR      /**< CBOR data type. */
 } DataType_t;
 
+/**
+ * @ingroup mqtt_file_downloader_struct_types
+ * @brief Strucure to mqtt file downloader context.
+ */
 typedef struct MqttFileDownloaderContext
 {
-    char topicStreamData[ TOPIC_STREAM_DATA_BUFFER_SIZE ];
-    size_t topicStreamDataLength;
-    char topicGetStream[ TOPIC_GET_STREAM_BUFFER_SIZE ];
-    size_t topicGetStreamLength;
-    uint8_t dataType;
+    char topicStreamData[ TOPIC_STREAM_DATA_BUFFER_SIZE ];      /**< Stream data MQTT topic. */
+    size_t topicStreamDataLength;                               /**< Stream data MQTT topic length. */
+    char topicGetStream[ TOPIC_GET_STREAM_BUFFER_SIZE ];        /**< Get Stream MQTT topic. */
+    size_t topicGetStreamLength;                                /**< Get Stream MQTT topic length. */
+    uint8_t dataType;                                           /**< Encoding type to be used to download the file. */
 } MqttFileDownloaderContext_t;
-
-/*
- * Structure to contain the data block information.
- */
-typedef struct MqttFileDownloaderDataBlockInfo
-{
-    uint8_t * payload;
-    size_t payloadLength;
-} MqttFileDownloaderDataBlockInfo_t;
-
-typedef void ( *MqttFileBlockHandler_t )(
-    MqttFileDownloaderDataBlockInfo_t * dataBlock );
 
 /**
  * Initializes the MQTT file downloader.
@@ -148,10 +143,13 @@ bool mqttDownloader_isDataBlockReceived( MqttFileDownloaderContext_t * context,
                                          size_t topicLength );
 
 /**
- * @brief Process incoming Publish message.
+ * @brief Retrieve the data block from incoming MQTT message and decode it.
  *
  * @param[in] context MQTT file downloader context pointer.
- * Publish message.
+ * @param[in] message Incoming MQTT message containing data block.
+ * @param[in] messageLength Incoming MQTT message length.
+ * @param[out] data Decoded data block.
+ * @param[in] dataLength Decoded data block length.
  *
  * @return returns True if the message is handled else False.
  */

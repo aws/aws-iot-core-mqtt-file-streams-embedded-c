@@ -1,0 +1,19 @@
+/**
+@mainpage Overview
+@anchor MQTT-File-Streams
+@brief MQTT file streams downloader library.
+
+MQTT file streams library can be used to downloaded files from AWS mqtt streams. This library provides functionality
+to initalize the file downloader, request the file blocks and decoding the received file blocks.
+
+*/
+
+/**
+@defgroup mqtt_file_downloader_enum_types Enumerated Types
+@brief Enumerated types of the MQTT file streams downloader library.
+*/
+
+/**
+@defgroup mqtt_file_downloader_struct_types Struct Types
+@brief Struct Types defined in the MQTT file streams downloader library.
+*/

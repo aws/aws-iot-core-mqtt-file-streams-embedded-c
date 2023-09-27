@@ -8,7 +8,7 @@
  */
 
 /**
- * @file ota_cbor.c
+ * @file MQTTFileDownloader_cbor.c
  * @brief CBOR encode/decode routines for AWS IoT Over-the-Air updates.
  */
 
