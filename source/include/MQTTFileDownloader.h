@@ -45,6 +45,7 @@
 #define TOPIC_GET_STREAM_BUFFER_SIZE \
     ( TOPIC_COMMON_PARTS_LEN + CONST_STRLEN( MQTT_API_GET_CBOR ) )
 
+#define GET_STREAM_REQUEST_BUFFER_SIZE       256U
 /*
  * Configure the Maximum size of the data payload.
  */
@@ -114,21 +115,24 @@ uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
                              uint8_t dataType );
 
 /**
- * Request the Data blocks from MQTT Streams.
+ * Creates the get request for Data blocks from MQTT Streams.
  *
- * @param[in] context MQTT file downloader context pointer.
+ * @param[in] dataType Either JSON or CBOR data type.
  * @param[in] fileId File Id of the file to be downloaded from MQTT Streams.
  * @param[in] blockSize Requested size of block.
  * @param[in] blockOffset Block Offset.
  * @param[in] numberOfBlocksRequested Number of Blocks requested per request.
+ * @param[out] getStreamRequest Buffer to store the get stream request.
  *
- * @return uint8_t returns appropriate MQTT File Downloader Status.
+ * @return size_t returns Length of the get stream request.
  */
-uint8_t mqttDownloader_requestDataBlock( MqttFileDownloaderContext_t * context,
-                                         uint16_t fileId,
-                                         uint32_t blockSize,
-                                         uint16_t blockOffset,
-                                         uint32_t numberOfBlocksRequested );
+size_t mqttDownloader_createGetDataBlockRequest(
+    uint8_t dataType,
+    uint16_t fileId,
+    uint32_t blockSize,
+    uint16_t blockOffset,
+    uint32_t numberOfBlocksRequested,
+    char * getStreamRequest );
 
 /**
  * @brief Checks if the incoming Publish message contains MQTT Data block.
