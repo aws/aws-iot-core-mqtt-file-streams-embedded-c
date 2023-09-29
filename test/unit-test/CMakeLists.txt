@@ -17,14 +17,12 @@ set( TINYCBOR_SOURCES
 # Include filepaths for source and include.
 include(${MODULE_ROOT_DIR}/mqttFileDownloaderFilePaths.cmake)
 include("${corejson_SOURCE_DIR}/jsonFilePaths.cmake")
-include("${coremqtt_SOURCE_DIR}/mqttFilePaths.cmake")
 
 # =====================  Create your mock here  (edit)  ========================
 
 # list the directories your mocks need
 list(APPEND mock_include_list
  "${MODULE_ROOT_DIR}/source/include"
- "${MODULE_ROOT_DIR}/test/unit-test/dependencies/coreMQTT/"
  "${tinycbor_SOURCE_DIR}/src/"
  ${MQTT_INCLUDE_PUBLIC_DIRS}
  )
@@ -35,14 +33,13 @@ list(APPEND mock_define_list "")
 # ================= Create the library under test here (edit) ==================
 
 # list the files you would like to test here
-list(APPEND real_source_files ${MQTT_FILE_DOWNLOADER_SOURCES} ${JSON_SOURCES} ${MQTT_SOURCES} ${TINYCBOR_SOURCES})
+list(APPEND real_source_files ${MQTT_FILE_DOWNLOADER_SOURCES} ${JSON_SOURCES} ${TINYCBOR_SOURCES})
 # list the directories the module under test includes
-list(APPEND real_include_directories . 
+list(APPEND real_include_directories .
     ${MQTT_FILE_DOWNLOADER_INCLUDES}
     ${JSON_INCLUDE_PUBLIC_DIRS}
     ${MQTT_INCLUDE_PUBLIC_DIRS}
     "${MODULE_ROOT_DIR}/test/unit-test/dependencies/"
-    "${MODULE_ROOT_DIR}/test/unit-test/dependencies/coreMQTT/"
 )
 
 # =====================  Create UnitTest Code here (edit)  =====================
@@ -58,7 +55,7 @@ set(utest_source "downloader_cbor_utest.c")
 set(mock_name "mqtt_file_downloader_cbor_mock")
 set(real_name "mqtt_file_downloader_cbor_real")
 
-list(APPEND cbor_mock_list 
+list(APPEND cbor_mock_list
     "${MODULE_ROOT_DIR}/test/unit-test/dependencies/cbor.h")
 
 create_mock_list(
@@ -81,8 +78,7 @@ set(utest_source "downloader_utest.c")
 set(mock_name "mqtt_file_downloader_mock")
 set(real_name "mqtt_file_downloader_real")
 
-list(APPEND mock_list 
-    "${MODULE_ROOT_DIR}/source/include/mqtt_wrapper.h"
+list(APPEND mock_list
     "${MODULE_ROOT_DIR}/source/include/MQTTFileDownloader_cbor.h")
 
 create_mock_list(

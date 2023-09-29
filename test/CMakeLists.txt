@@ -49,13 +49,7 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/FreeRTOS/coreJSON.git
   GIT_TAG a0cd6122745a879225bf459dd257e79bdd63d37a)
 
-FetchContent_Declare(
-  CoreMQTT
-  # hash: sha256-iT+mjlduomUTWYEdpoRwoLxJzI0daPjypxlXlXie7nc=
-  GIT_REPOSITORY https://github.com/FreeRTOS/coreMQTT.git
-  GIT_TAG d41f4572ff4e91d1d3116093331aa23936038f35)
-
-FetchContent_MakeAvailable(CMock tinycbor CoreJSON CoreMQTT)
+FetchContent_MakeAvailable(CMock tinycbor CoreJSON )
 
 # tinycbor
 add_library(
@@ -69,16 +63,6 @@ target_include_directories(tinycbor PUBLIC "${tinycbor_SOURCE_DIR}/src")
 include("${corejson_SOURCE_DIR}/jsonFilePaths.cmake")
 add_library(coreJSON ${JSON_SOURCES})
 target_include_directories(coreJSON PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS})
-
-# coreMQTT
-include("${coremqtt_SOURCE_DIR}/mqttFilePaths.cmake")
-add_library(coreMQTT ${MQTT_SOURCES} ${MQTT_SERIALIZER_SOURCES})
-target_include_directories(
-  coreMQTT
-  PUBLIC ${MQTT_INCLUDE_PUBLIC_DIRS}
-  PRIVATE "${CMAKE_CURRENT_LIST_DIR}/unit-test/dependencies/coreMQTT"
-  INTERFACE "${CMAKE_CURRENT_LIST_DIR}/unit-test/dependencies/coreMQTT/api_cfg")
-target_link_libraries(coreMQTT)
 
 # cmock
 add_library(
