@@ -120,6 +120,10 @@ void test_init_returnsSuccess_forJSONDataType( void )
     uintResult = mqttDownloader_init(&context, streamName, streamNameLength, thingName, thingNameLength, DATA_TYPE_JSON);
 
     TEST_ASSERT_EQUAL(MQTTFileDownloaderSuccess, uintResult);
+    TEST_ASSERT_EQUAL_MEMORY("$aws/things/thingname/streams/stream-name/data/json", context.topicStreamData, strlen("$aws/things/thingname/streams/stream-name/data/json"));
+    TEST_ASSERT_EQUAL_INT(strlen("$aws/things/thingname/streams/stream-name/data/json"), context.topicStreamDataLength);
+    TEST_ASSERT_EQUAL_MEMORY("$aws/things/thingname/streams/stream-name/get/json", context.topicGetStream, strlen("$aws/things/thingname/streams/stream-name/get/json"));
+    TEST_ASSERT_EQUAL_INT(strlen("$aws/things/thingname/streams/stream-name/get/json"), context.topicGetStreamLength);
 }
 
 void test_init_returnsSuccess_forCBORDataType( void )
@@ -129,6 +133,10 @@ void test_init_returnsSuccess_forCBORDataType( void )
     uintResult = mqttDownloader_init(&context, streamName, streamNameLength, thingName, thingNameLength, DATA_TYPE_CBOR);
 
     TEST_ASSERT_EQUAL(MQTTFileDownloaderSuccess, uintResult);
+    TEST_ASSERT_EQUAL_MEMORY("$aws/things/thingname/streams/stream-name/data/cbor", context.topicStreamData, strlen("$aws/things/thingname/streams/stream-name/data/cbor"));
+    TEST_ASSERT_EQUAL_INT(strlen("$aws/things/thingname/streams/stream-name/data/cbor"), context.topicStreamDataLength);
+    TEST_ASSERT_EQUAL_MEMORY("$aws/things/thingname/streams/stream-name/get/cbor", context.topicGetStream, strlen("$aws/things/thingname/streams/stream-name/get/cbor"));
+    TEST_ASSERT_EQUAL_INT(strlen("$aws/things/thingname/streams/stream-name/get/cbor"), context.topicGetStreamLength);
 }
 
 void test_init_returnsBadParam_givenNullContext( void )
@@ -144,13 +152,16 @@ void test_createGetDataBlockRequest_succeedsForJSONDataType( void )
 
     requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_JSON, 4U, 3U, 2U, 1U, getStreamRequest);
     TEST_ASSERT_EQUAL_INT(strlen("{\"s\": 1,\"f\": 4,\"l\": 3,\"o\": 2,\"n\": 1}"), requestLength);
+    TEST_ASSERT_EQUAL_MEMORY(getStreamRequest, "{\"s\": 1,\"f\": 4,\"l\": 3,\"o\": 2,\"n\": 1}", strlen("{\"s\": 1,\"f\": 4,\"l\": 3,\"o\": 2,\"n\": 1}") );
 }
 
 void test_createGetDataBlockRequest_succeedsForCBORDataType( void )
 {
     char getStreamRequest[ GET_STREAM_REQUEST_BUFFER_SIZE ];
 
-    size_t expectedCborSize = 10U;
+    char *encodedMessage = "expected-message";
+    size_t expectedCborSize = 9999U;
+
     CBOR_Encode_GetStreamRequestMessage_ExpectAndReturn(getStreamRequest,
         GET_STREAM_REQUEST_BUFFER_SIZE,
         NULL,
@@ -164,10 +175,13 @@ void test_createGetDataBlockRequest_succeedsForCBORDataType( void )
         true);
 
     CBOR_Encode_GetStreamRequestMessage_IgnoreArg_encodedMessageSize();
+    CBOR_Encode_GetStreamRequestMessage_IgnoreArg_messageBuffer();
     CBOR_Encode_GetStreamRequestMessage_ReturnThruPtr_encodedMessageSize(&expectedCborSize);
+    CBOR_Encode_GetStreamRequestMessage_ReturnThruPtr_messageBuffer(encodedMessage);
 
     requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_CBOR, 4U, 3U, 2U, 1U, getStreamRequest);
     TEST_ASSERT_EQUAL(expectedCborSize, requestLength);
+    TEST_ASSERT_EQUAL_MEMORY(encodedMessage, "expected-message", strlen(encodedMessage));
 }
 
 void test_isDataBlockReceived_returnTrue( void )
