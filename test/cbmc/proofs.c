@@ -58,7 +58,7 @@ void proof_mqttDownloader_createGetDataBlockRequest( void )
     char * getStreamRequest[256] = {0}; 
     size_t ret;
 
-    __CPROVER_assume(dataType == 0 || dataType == 1);
+    __CPROVER_assume(dataType == 0 || dataType == 1); 
 
     __CPROVER_assume(fileId != NULL );
 
@@ -77,8 +77,70 @@ void proof_mqttDownloader_createGetDataBlockRequest( void )
 
 }
 
+void proof_mqttDownloader_isDataBlockReceived( void )
+{
+    MqttFileDownloaderContext_t * context = {0};
+    char * topic;
+    size_t topicLength;
+    bool ret;
+
+    //__CPROVER_assume(context->dataType != NULL);
+
+    __CPROVER_assume(context->topicGetStream != NULL);
+
+    //__CPROVER_assume(context->topicGetStreamLength != NULL);
+
+    __CPROVER_assume(context->topicStreamData != NULL);
+
+    __CPROVER_assume(context->topicStreamDataLength != NULL);
+
+    __CPROVER_assume(topicLength <= CBMC_TOPIC_MAX_LEN);
+
+    topic = malloc(topicLength);
+
+    ret = mqttDownloader_isDataBlockReceived(context,
+                                             topic,
+                                             topicLength);
+
+}
+
+void proof_mqttDownloader_processReceivedDataBlock( void )
+{
+    MqttFileDownloaderContext_t * context = {0};
+    uint8_t * message;
+    size_t messageLength;
+    uint8_t * data;
+    size_t * dataLength;
+    bool ret;
+
+    __CPROVER_assume(context->dataType != NULL);
+
+    __CPROVER_assume(context->topicGetStream != NULL);
+
+    __CPROVER_assume(context->topicGetStreamLength != NULL);
+
+    __CPROVER_assume(context->topicStreamData != NULL);
+
+    __CPROVER_assume(context->topicStreamDataLength != NULL);
+
+    __CPROVER_assume(messageLength <= CBMC_TOPIC_MAX_LEN);
+    message = malloc(messageLength);
+
+    __CPROVER_assume(dataLength <= CBMC_TOPIC_MAX_LEN);
+    data = malloc(dataLength);
+
+    ret = mqttDownloader_processReceivedDataBlock(context,
+                                                  message,
+                                                  messageLength,
+                                                  data,
+                                                  dataLength);
+
+}
+
 int main( )
 {
     proof_mqttDownloader_init();
     proof_mqttDownloader_createGetDataBlockRequest();
+    proof_mqttDownloader_isDataBlockReceived();
+    proof_mqttDownloader_processReceivedDataBlock();
 }

@@ -6,7 +6,7 @@ UNWIND_COUNT=${UNWIND_COUNT:-10}
 
 #If coreJSON not found, clone it
 if [ ! -d "$coreJSONDir" ]; then
-    git clone https://github.com/FreeRTOS/coreJSON.git
+    git clone https://github.com/FreeRTOS/coreJSON.git --depth 1 --branch v3.2.0
 fi
 
 cd "$(dirname -- "$0")/../../" || exit 1
