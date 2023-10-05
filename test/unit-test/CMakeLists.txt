@@ -24,7 +24,6 @@ include("${corejson_SOURCE_DIR}/jsonFilePaths.cmake")
 list(APPEND mock_include_list
  "${MODULE_ROOT_DIR}/source/include"
  "${tinycbor_SOURCE_DIR}/src/"
- ${MQTT_INCLUDE_PUBLIC_DIRS}
  )
 
 # list the definitions of your mocks to control what to be included
@@ -38,7 +37,6 @@ list(APPEND real_source_files ${MQTT_FILE_DOWNLOADER_SOURCES} ${JSON_SOURCES} ${
 list(APPEND real_include_directories .
     ${MQTT_FILE_DOWNLOADER_INCLUDES}
     ${JSON_INCLUDE_PUBLIC_DIRS}
-    ${MQTT_INCLUDE_PUBLIC_DIRS}
     "${MODULE_ROOT_DIR}/test/unit-test/dependencies/"
 )
 
@@ -63,7 +61,7 @@ create_mock_list(
   "${mock_include_list}" "${mock_define_list}")
 
 create_real_library(${real_name} "${real_source_files}"
-                    "${real_include_directories}" "${mock_define_list}")
+                    "${real_include_directories}" "${mock_name}")
 
 list(APPEND cbor_downloader_link_list -l${mock_name} lib${real_name}.a)
 
@@ -86,7 +84,7 @@ create_mock_list(
   "${mock_include_list}" "${mock_define_list}")
 
 create_real_library(${real_name} "${real_source_files}"
-                    "${real_include_directories}" "${mock_define_list}")
+                    "${real_include_directories}" "${mock_name}")
 
 list(APPEND file_downloader_list -l${mock_name} lib${real_name}.a)
 
@@ -101,7 +99,7 @@ set(utest_name "mqtt_file_downloader_base64_utest")
 set(utest_source "downloader_base64_utest.c")
 
 create_real_library(${real_name} "${real_source_files}"
-                    "${real_include_directories}" "${mock_define_list}")
+                    "${real_include_directories}" "${mock_name}")
 
 list(APPEND utest_link_list -l${mock_name} lib${real_name}.a)
 
