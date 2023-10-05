@@ -1,3 +1,4 @@
 #Emitted when running cbmc 
 coreJSON
+tinyCBOR
 output/*
