@@ -44,7 +44,9 @@ void proof_mqttDownloader_init( void )
                               thingName,
                               thingNameLength,
                               dataType);
-    
+
+    __CPROVER_assert(ret >= MQTTFileDownloaderSuccess && ret <= MQTTFileDownloaderDataDecodingFailed, 
+                     "Return value is in range of MQTTFileDownloaderStatus_t" );
     
 }
 
@@ -87,7 +89,6 @@ void proof_mqttDownloader_isDataBlockReceived( void )
     bool ret;
 
     __CPROVER_assume(topicLength <= CBMC_TOPIC_MAX_LEN);
-
     topic = malloc(topicLength);
 
     ret = mqttDownloader_isDataBlockReceived(&context,
@@ -141,6 +142,9 @@ void proof_mqttDownloader_base64_Decode( void )
                         resultLen,
                         encodedData,
                         encodedLen);
+    
+    __CPROVER_assert(ret >= Base64Success && ret <= Base64InvalidPaddingSymbol,
+                    "Return value is in range of Base64Status_t.");
 
 }
 
@@ -154,6 +158,19 @@ void proof_CBOR_Decode_GetStreamResponseMessage( void )
     uint8_t * const * payload;
     size_t * payloadSize;
     bool ret; 
+
+    __CPROVER_assume(messageSize <= CBMC_TOPIC_MAX_LEN);
+    messageBuffer = malloc(messageSize);
+
+    __CPROVER_assume(fileId  == 0);
+
+    __CPROVER_assume(blockId == 0);
+
+    __CPROVER_assume(blockSize == 0);
+
+    __CPROVER_assume(payloadSize == 256);
+
+    payload = malloc(256);
 
     ret = CBOR_Decode_GetStreamResponseMessage(messageBuffer,
                                                messageSize,
@@ -171,7 +188,7 @@ void proof_CBOR_Encode_GetStreamRequestMessage( void )
 {
     uint8_t * messageBuffer;
     size_t messageBufferSize;
-    size_t * encodedMessageSize;
+    size_t * encodedMessageSize = 0;
     const char * clientToken;
     uint32_t fileId;
     uint32_t blockSize;
@@ -181,25 +198,24 @@ void proof_CBOR_Encode_GetStreamRequestMessage( void )
     uint32_t numOfBlocksRequested;
     bool ret;
 
-    __CPROVER_assume(messageBuffer != NULL);
+    __CPROVER_assume( messageBufferSize == 256 );
+    messageBuffer = malloc(messageBufferSize);
 
-    __CPROVER_assume(messageBufferSize != NULL);
+    __CPROVER_assume(encodedMessageSize != NULL );
 
-    __CPROVER_assume(encodedMessageSize != NULL);
+    clientToken =  "rdy";
 
-    __CPROVER_assume(clientToken != NULL);
+    __CPROVER_assume(fileId != NULL );
 
-    __CPROVER_assume(fileId != NULL);
+    __CPROVER_assume(blockSize != NULL );
 
-    __CPROVER_assume(blockSize != NULL);
+    __CPROVER_assume(blockOffset != NULL );
 
-    __CPROVER_assume(blockOffset != NULL);
+    __CPROVER_assume(blockBitmap = "MQ==" );
 
-    __CPROVER_assume(blockBitmap != NULL);
+    __CPROVER_assume(blockBitmapSize == strlen("MQ==") );
 
-    __CPROVER_assume(blockBitmapSize != NULL);
-
-    __CPROVER_assume(numOfBlocksRequested != NULL);
+    __CPROVER_assume(numOfBlocksRequested <= 10 );
 
 
 
@@ -224,8 +240,8 @@ int main( )
     proof_mqttDownloader_processReceivedDataBlock();
     /* Functions in MQTTDownloader_base64.c */
     proof_mqttDownloader_base64_Decode();
-    /* Functions in MQTTDownloader_cbor.c */
-    // proof_CBOR_Decode_GetStreamResponseMessage();
-    // proof_CBOR_Encode_GetStreamRequestMessage();
+    // /* Functions in MQTTDownloader_cbor.c */
+    proof_CBOR_Decode_GetStreamResponseMessage();
+    proof_CBOR_Encode_GetStreamRequestMessage();
 
 }

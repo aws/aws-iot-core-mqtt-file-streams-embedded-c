@@ -2,6 +2,7 @@
 
 coreJSONDir="coreJSON"
 tinyCborDir="tinyCBOR"
+MQTTStreamingSourceDir="../../source"
 
 UNWIND_COUNT=${UNWIND_COUNT:-10}
 
@@ -15,13 +16,9 @@ if [ ! -d "$tinyCborDir" ]; then
     git clone https://github.com/intel/tinycbor.git --depth 1 --branch v0.6.0
 fi
 
-MQTTStreamingSourceDir="../../source"
-
-exec cbmc proofs.c $MQTTStreamingSourceDir/MQTTFileDownloader.c \
-     $MQTTStreamingSourceDir/MQTTFileDownloader_cbor.c \
-     $MQTTStreamingSourceDir/MQTTFileDownloader_base64.c proofs.c  \
-     $tinyCborDir/src/cborencoder.c $tinyCborDir/src/cborencoder_close_container_checked.c \
-     stubs/strnlen.c stubs/JSON_SearchT.c proofs.c \
+exec cbmc stubs/strnlen.c stubs/JSON_SearchT.c proofs.c $MQTTStreamingSourceDir/MQTTFileDownloader.c \
+     $MQTTStreamingSourceDir/MQTTFileDownloader_cbor.c $MQTTStreamingSourceDir/MQTTFileDownloader_base64.c \
+     $tinyCborDir/src/cborencoder.c $tinyCborDir/src/cborencoder_close_container_checked.c tinyCBOR/src/cborparser.c \
      -I $MQTTStreamingSourceDir/include -I coreJSON/source/include  -I tinyCBOR/src \
      --unwindset strlen.0:36 \
      --unwindset __builtin___strncat_chk.0:192 \
@@ -30,5 +27,5 @@ exec cbmc proofs.c $MQTTStreamingSourceDir/MQTTFileDownloader.c \
      --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check \
      --conversion-check --undefined-shift-check --enum-range-check \
      --pointer-primitive-check --drop-unused-functions --nondet-static \
-     --unwinding-assertions --c99 --trace "$@" --unwind "$UNWIND_COUNT" \
-     -DUNWIND_COUNT="$UNWIND_COUNT" >&1 | tee output/cbmcOutput.txt
+     --unwinding-assertions --c99 --trace "$@" --unwind "$UNWIND_COUNT"  \
+     -DUNWIND_COUNT="$UNWIND_COUNT" >&1 | tee output/latest/html/cbmcOutput.txt
