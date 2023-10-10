@@ -240,7 +240,7 @@ int main( )
     proof_mqttDownloader_processReceivedDataBlock();
     /* Functions in MQTTDownloader_base64.c */
     proof_mqttDownloader_base64_Decode();
-    // /* Functions in MQTTDownloader_cbor.c */
+    /* Functions in MQTTDownloader_cbor.c */
     proof_CBOR_Decode_GetStreamResponseMessage();
     proof_CBOR_Encode_GetStreamRequestMessage();
 
