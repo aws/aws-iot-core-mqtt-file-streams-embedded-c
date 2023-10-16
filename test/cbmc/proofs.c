@@ -37,8 +37,6 @@ void proof_mqttDownloader_init( void )
     __CPROVER_assume(thingNameLength < CBMC_THINGNAME_MAX_LEN);
     thingName = malloc(thingNameLength); 
 
-    __CPROVER_assume(dataType <= 255);
-
     ret = mqttDownloader_init(&context,
                               streamName,
                               streamNameLength,
@@ -59,19 +57,12 @@ void proof_mqttDownloader_createGetDataBlockRequest( void )
     uint16_t blockOffset;
     uint32_t numberOfBlocksRequested;
     char * getStreamRequest; 
+    uint32_t getStreamRequestLength;
     size_t ret;
 
     getStreamRequest = malloc(256);
 
     __CPROVER_assume(dataType == DATA_TYPE_JSON || dataType == DATA_TYPE_CBOR); 
-
-    __CPROVER_assume(fileId != NULL);
-
-    __CPROVER_assume(blockSize != NULL);
-
-    __CPROVER_assume(blockOffset != NULL);
-
-    __CPROVER_assume(numberOfBlocksRequested != NULL);
 
     ret = mqttDownloader_createGetDataBlockRequest(dataType,
                                                    fileId,
@@ -125,7 +116,7 @@ void proof_mqttDownloader_base64_Decode( void )
 {
     uint8_t * dest;
     const size_t destLen;
-    size_t * resultLen = 0;
+    size_t resultLen;
     const uint8_t * encodedData;
     const size_t encodedLen;
     Base64Status_t ret;
@@ -133,14 +124,14 @@ void proof_mqttDownloader_base64_Decode( void )
     __CPROVER_assume(destLen <= CBMC_MAX_BUFSIZE );
     dest = malloc(destLen);
 
-    __CPROVER_assume(resultLen != NULL);
+    __CPROVER_assume(&resultLen != NULL);
 
     __CPROVER_assume(encodedLen <= CBMC_MAX_BUFSIZE );
     encodedData = malloc(encodedLen);
 
     ret = base64_Decode(dest,
                         destLen,
-                        resultLen,
+                        &resultLen,
                         encodedData,
                         encodedLen);
     
@@ -153,21 +144,15 @@ void proof_CBOR_Decode_GetStreamResponseMessage( void )
 {
     const uint8_t * messageBuffer;
     size_t messageSize;
-    int32_t * fileId;
-    int32_t * blockId;
-    int32_t * blockSize;
+    int32_t * fileId = 0;
+    int32_t * blockId = 0;
+    int32_t * blockSize = 0;
     uint8_t * const * payload;
     size_t * payloadSize;
     bool ret; 
 
     __CPROVER_assume(messageSize <= UINT32_MAX);
     messageBuffer = malloc(messageSize);
-
-    __CPROVER_assume(fileId  == 0);
-
-    __CPROVER_assume(blockId == 0);
-
-    __CPROVER_assume(blockSize == 0);
 
     __CPROVER_assume(payloadSize == 256);
 
@@ -201,24 +186,8 @@ void proof_CBOR_Encode_GetStreamRequestMessage( void )
 
     __CPROVER_assume( messageBufferSize <= UINT32_MAX );
     messageBuffer = malloc(messageBufferSize);
-
-    __CPROVER_assume(encodedMessageSize != NULL );
-
-    __CPROVER_assume(clientToken ==  "rdy");
-
-    __CPROVER_assume(fileId != NULL );
-
-    __CPROVER_assume(blockSize != NULL );
-
-    __CPROVER_assume(blockOffset != NULL );
-
-    __CPROVER_assume(blockBitmap == "MQ==" );
-
-    __CPROVER_assume(blockBitmapSize == strlen("MQ==") );
-
+    
     __CPROVER_assume(numOfBlocksRequested <= UNWIND_COUNT );
-
-
 
     ret = CBOR_Encode_GetStreamRequestMessage(messageBuffer,
                                               messageBufferSize,
