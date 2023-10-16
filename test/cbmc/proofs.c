@@ -15,10 +15,11 @@
 #endif
 
 #define CBMC_MAX_OBJECT_SIZE ( PTRDIFF_MAX )
-#define CBMC_MAX_BUFSIZE ( UNWIND_COUNT )
+#define CBMC_MAX_BUFSIZE ( UNWIND_COUNT -1)
 #define CBMC_STREAMNAME_MAX_LEN (UNWIND_COUNT -1)
 #define CBMC_THINGNAME_MAX_LEN (UNWIND_COUNT -1)
 #define CBMC_TOPIC_MAX_LEN (UNWIND_COUNT -1)
+#define CBMC_MESSAGE_MAX_LEN (UNWIND_COUNT - 1)
 
 void proof_mqttDownloader_init( void )
 {
@@ -129,12 +130,12 @@ void proof_mqttDownloader_base64_Decode( void )
     const size_t encodedLen;
     Base64Status_t ret;
 
-    __CPROVER_assume(destLen <= CBMC_MAX_BUFSIZE -1 );
+    __CPROVER_assume(destLen <= CBMC_MAX_BUFSIZE );
     dest = malloc(destLen);
 
     __CPROVER_assume(resultLen != NULL);
 
-    __CPROVER_assume(encodedLen <= CBMC_MAX_BUFSIZE- 1 );
+    __CPROVER_assume(encodedLen <= CBMC_MAX_BUFSIZE );
     encodedData = malloc(encodedLen);
 
     ret = base64_Decode(dest,
@@ -159,7 +160,7 @@ void proof_CBOR_Decode_GetStreamResponseMessage( void )
     size_t * payloadSize;
     bool ret; 
 
-    __CPROVER_assume(messageSize <= CBMC_TOPIC_MAX_LEN);
+    __CPROVER_assume(messageSize <= UINT32_MAX);
     messageBuffer = malloc(messageSize);
 
     __CPROVER_assume(fileId  == 0);
@@ -170,7 +171,7 @@ void proof_CBOR_Decode_GetStreamResponseMessage( void )
 
     __CPROVER_assume(payloadSize == 256);
 
-    payload = malloc(256);
+    payload = malloc(payloadSize);
 
     ret = CBOR_Decode_GetStreamResponseMessage(messageBuffer,
                                                messageSize,
@@ -198,12 +199,12 @@ void proof_CBOR_Encode_GetStreamRequestMessage( void )
     uint32_t numOfBlocksRequested;
     bool ret;
 
-    __CPROVER_assume( messageBufferSize == 256 );
+    __CPROVER_assume( messageBufferSize <= UINT32_MAX );
     messageBuffer = malloc(messageBufferSize);
 
     __CPROVER_assume(encodedMessageSize != NULL );
 
-    clientToken =  "rdy";
+    __CPROVER_assume(clientToken ==  "rdy");
 
     __CPROVER_assume(fileId != NULL );
 
@@ -211,11 +212,11 @@ void proof_CBOR_Encode_GetStreamRequestMessage( void )
 
     __CPROVER_assume(blockOffset != NULL );
 
-    __CPROVER_assume(blockBitmap = "MQ==" );
+    __CPROVER_assume(blockBitmap == "MQ==" );
 
     __CPROVER_assume(blockBitmapSize == strlen("MQ==") );
 
-    __CPROVER_assume(numOfBlocksRequested <= 10 );
+    __CPROVER_assume(numOfBlocksRequested <= UNWIND_COUNT );
 
 
 
