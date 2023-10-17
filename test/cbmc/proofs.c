@@ -232,11 +232,11 @@ void proofs_fast( void )
     /* Functions in MQTTDownloader_base64.c */
     proof_mqttDownloader_base64_Decode();
     /* Functions in MQTTDownloader_cbor.c */
-    proof_CBOR_Decode_GetStreamResponseMessage();
+    proof_CBOR_Encode_GetStreamRequestMessage();
 }
 
 int main( )
 {
     proofs_fast();
-    proof_CBOR_Encode_GetStreamRequestMessage();
+    proof_CBOR_Decode_GetStreamResponseMessage();
 }

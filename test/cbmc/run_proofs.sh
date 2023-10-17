@@ -1,7 +1,7 @@
 #!/bin/sh
 
 coreJSONDir="coreJSON"
-tinyCborDir="tinyCBOR"
+tinyCborDir="tinycbor"
 MQTTStreamingSourceDir="../../source"
 
 UNWIND_COUNT=${UNWIND_COUNT:-10}
@@ -18,8 +18,8 @@ fi
 
 exec cbmc stubs/strnlen.c stubs/JSON_SearchT.c proofs.c $MQTTStreamingSourceDir/MQTTFileDownloader.c \
      $MQTTStreamingSourceDir/MQTTFileDownloader_cbor.c $MQTTStreamingSourceDir/MQTTFileDownloader_base64.c \
-     $tinyCborDir/src/cborencoder.c $tinyCborDir/src/cborencoder_close_container_checked.c tinyCBOR/src/cborparser.c \
-     -I $MQTTStreamingSourceDir/include -I coreJSON/source/include  -I tinyCBOR/src \
+     $tinyCborDir/src/cborencoder.c $tinyCborDir/src/cborencoder_close_container_checked.c $tinyCborDir/src/cborparser.c \
+     -I $MQTTStreamingSourceDir/include -I coreJSON/source/include  -I $tinyCborDir/src \
      --unwindset strlen.0:36 \
      --unwindset __builtin___strncat_chk.0:192 \
      --unwindset __builtin___strncat_chk.1:205 \
