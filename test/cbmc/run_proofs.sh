@@ -11,15 +11,11 @@ if [ ! -d "$coreJSONDir" ]; then
     git clone https://github.com/FreeRTOS/coreJSON.git --depth 1 --branch v3.2.0
 fi
 
-#If tinyCBOR not found, clone it
-if [ ! -d "$tinyCborDir" ]; then
-    git clone https://github.com/intel/tinycbor.git --depth 1 --branch v0.6.0
-fi
-
-exec cbmc stubs/strnlen.c stubs/JSON_SearchT.c proofs.c $MQTTStreamingSourceDir/MQTTFileDownloader.c \
-     $MQTTStreamingSourceDir/MQTTFileDownloader_cbor.c $MQTTStreamingSourceDir/MQTTFileDownloader_base64.c \
-     $tinyCborDir/src/cborencoder.c $tinyCborDir/src/cborencoder_close_container_checked.c $tinyCborDir/src/cborparser.c \
-     -I $MQTTStreamingSourceDir/include -I coreJSON/source/include  -I $tinyCborDir/src \
+exec cbmc stubs/strnlen.c stubs/JSON_SearchT.c stubs/tinycbor.c proofs.c \
+     $MQTTStreamingSourceDir/MQTTFileDownloader.c \
+     $MQTTStreamingSourceDir/MQTTFileDownloader_cbor.c \
+     $MQTTStreamingSourceDir/MQTTFileDownloader_base64.c \
+     -I $MQTTStreamingSourceDir/include -I coreJSON/source/include  -I include \
      --unwindset strlen.0:36 \
      --unwindset __builtin___strncat_chk.0:192 \
      --unwindset __builtin___strncat_chk.1:205 \
