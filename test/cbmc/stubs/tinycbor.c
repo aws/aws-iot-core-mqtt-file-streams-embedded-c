@@ -1,5 +1,7 @@
 #include "cbor.h"
 
+#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
 /* Utils */
@@ -17,7 +19,7 @@ CborType nondet_CborType( void )
                        CborInvalidType};
     
     int index = nondet_int();
-    __CPROVER_assume(index >= 0 && index <= 13);
+    __CPROVER_assume(index >= 0 && index <= (sizeof(cborTypes)/ sizeof(cborTypes[0])));
 
     return cborTypes[index];
 }
@@ -41,7 +43,7 @@ CborError nondet_CborError( void )
                           CborErrorOutOfMemory, CborErrorInternalError};
 
     int index = nondet_int();
-    __CPROVER_assume(index >= 0 && index <= 33);
+    __CPROVER_assume(index >= 0 && index <= (sizeof(cborErrors) / sizeof(cborErrors[0])));
 
     return cborErrors[index];
 }
@@ -68,6 +70,7 @@ CborError cbor_parser_init(const uint8_t * buffer,
     __CPROVER_assert( it != NULL, "cbor value is not null.");
 
     CborError ret = nondet_CborError();
+
     __CPROVER_assume((ret == CborErrorUnexpectedEOF) || 
                      (ret == CborErrorUnknownType) ||
                      (ret == CborErrorIllegalNumber)|| 
@@ -122,7 +125,7 @@ CborError cbor_value_calculate_string_length(const CborValue * value,
     __CPROVER_assert( value != NULL, "CborValue is not NULL");
     __CPROVER_assert( len != NULL, "length is not NULL");
 
-    CborError ret = 0;
+    CborError ret = nondet_CborError();
 
     __CPROVER_assume( (ret == CborErrorNoMoreStringChunks) ||
                       (ret == CborErrorDataTooLarge) ||
