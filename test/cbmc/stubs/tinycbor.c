@@ -19,7 +19,7 @@ CborType nondet_CborType( void )
                        CborInvalidType};
     
     int index = nondet_int();
-    __CPROVER_assume(index >= 0 && index <= (sizeof(cborTypes)/ sizeof(cborTypes[0])));
+    __CPROVER_assume(index >= 0 && index <= (sizeof(cborTypes)/ sizeof(cborTypes[0]))-1);
 
     return cborTypes[index];
 }
@@ -43,7 +43,7 @@ CborError nondet_CborError( void )
                           CborErrorOutOfMemory, CborErrorInternalError};
 
     int index = nondet_int();
-    __CPROVER_assume(index >= 0 && index <= (sizeof(cborErrors) / sizeof(cborErrors[0])));
+    __CPROVER_assume(index >= 0 && index <= (sizeof(cborErrors) / sizeof(cborErrors[0]))-1);
 
     return cborErrors[index];
 }
