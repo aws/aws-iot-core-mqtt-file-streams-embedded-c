@@ -7,6 +7,11 @@
  * the License.
  */
 
+/**
+ * @file MQTTFileDownloader.h
+ * @brief MQTT file streaming APIs declaration.
+ */
+
 #ifndef MQTT_FILE_DOWNLOADER_H
 #define MQTT_FILE_DOWNLOADER_H
 
@@ -26,30 +31,53 @@
 #define MQTT_API_DATA_JSON  "/data/json"   /*!< JSON DATA Stream API suffix. */
 #define MQTT_API_GET_JSON   "/get/json"    /*!< JSON GET Stream API suffix. */
 
-/* Maximum lengths for constants used in MQTT downloader.
- * These are used to calculate the static size of buffers used to store MQTT
- * topic and message strings. Each length is in terms of bytes. */
+/**
+ * @ingroup mqtt_file_downloader_const_types
+ * Maximum stream name length.
+*/
 #define STREAM_NAME_MAX_LEN 44U
+
+/**
+ * @ingroup mqtt_file_downloader_const_types
+ * Length of NULL character. Used in calculating lengths of MQTT topics.
+*/
 #define NULL_CHAR_LEN       1U
+
+/**
+ * @ingroup mqtt_file_downloader_const_types
+ * Maximum thing name length.
+*/
 #define MAX_THINGNAME_LEN   128U
-
-#define CONST_STRLEN( s )   ( ( ( uint32_t ) sizeof( s ) ) - 1UL )
-
-#define TOPIC_COMMON_PARTS_LEN                              \
-    ( CONST_STRLEN( MQTT_API_THINGS ) + MAX_THINGNAME_LEN + \
-      CONST_STRLEN( MQTT_API_STREAMS ) + STREAM_NAME_MAX_LEN + NULL_CHAR_LEN )
-
-#define TOPIC_STREAM_DATA_BUFFER_SIZE \
-    ( TOPIC_COMMON_PARTS_LEN + CONST_STRLEN( MQTT_API_DATA_CBOR ) )
-
-#define TOPIC_GET_STREAM_BUFFER_SIZE \
-    ( TOPIC_COMMON_PARTS_LEN + CONST_STRLEN( MQTT_API_GET_CBOR ) )
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * @brief Configure the Maximum size of the data payload.
  */
 #define mqttFileDownloader_CONFIG_BLOCK_SIZE 256U
+
+/**
+ * @brief Macro to calculate string length.
+ */
+#define CONST_STRLEN( s )   ( ( ( uint32_t ) sizeof( s ) ) - 1UL )
+
+/**
+ * @brief Length of common parts MQTT topic.
+ */
+#define TOPIC_COMMON_PARTS_LEN                              \
+    ( CONST_STRLEN( MQTT_API_THINGS ) + MAX_THINGNAME_LEN + \
+      CONST_STRLEN( MQTT_API_STREAMS ) + STREAM_NAME_MAX_LEN + NULL_CHAR_LEN )
+
+/**
+ * @brief Length stream data buffer.
+ */
+#define TOPIC_STREAM_DATA_BUFFER_SIZE \
+    ( TOPIC_COMMON_PARTS_LEN + CONST_STRLEN( MQTT_API_DATA_CBOR ) )
+
+/**
+ * @brief Length of get stream buffer.
+ */
+#define TOPIC_GET_STREAM_BUFFER_SIZE \
+    ( TOPIC_COMMON_PARTS_LEN + CONST_STRLEN( MQTT_API_GET_CBOR ) )
 
 /**
  * @ingroup mqtt_file_downloader_enum_types
@@ -90,8 +118,7 @@ typedef struct MqttFileDownloaderContext
 } MqttFileDownloaderContext_t;
 
 /**
- * Initializes the MQTT file downloader.
- * Creates the topic name the DATA and Get Stream Data topics
+ * @brief Initializes the MQTT file downloader. Creates the topic name the DATA and Get Stream Data topics
  *
  * @param[in] context MQTT file downloader context pointer.
  * @param[in] streamName Stream name to download the file.
@@ -102,15 +129,17 @@ typedef struct MqttFileDownloaderContext
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
+/* @[declare_mqttDownloader_init] */
 uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
                              char * streamName,
                              size_t streamNameLength,
                              char * thingName,
                              size_t thingNameLength,
                              uint8_t dataType );
+/* @[declare_mqttDownloader_init] */
 
 /**
- * Creates the get request for Data blocks from MQTT Streams.
+ * @brief Creates the get request for Data blocks from MQTT Streams.
  *
  * @param[in] dataType Either JSON or CBOR data type.
  * @param[in] fileId File Id of the file to be downloaded from MQTT Streams.
@@ -121,6 +150,7 @@ uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
  *
  * @return size_t returns Length of the get stream request.
  */
+/* @[declare_mqttDownloader_createGetDataBlockRequest] */
 size_t mqttDownloader_createGetDataBlockRequest(
     uint8_t dataType,
     uint16_t fileId,
@@ -128,6 +158,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
     uint16_t blockOffset,
     uint32_t numberOfBlocksRequested,
     char * getStreamRequest );
+/* @[declare_mqttDownloader_createGetDataBlockRequest] */
 
 /**
  * @brief Checks if the incoming Publish message contains MQTT Data block.
@@ -138,9 +169,11 @@ size_t mqttDownloader_createGetDataBlockRequest(
  *
  * @return returns True if the message contains Data block else False.
  */
+/* @[declare_mqttDownloader_isDataBlockReceived] */
 bool mqttDownloader_isDataBlockReceived( MqttFileDownloaderContext_t * context,
                                          char * topic,
                                          size_t topicLength );
+/* @[declare_mqttDownloader_isDataBlockReceived] */
 
 /**
  * @brief Retrieve the data block from incoming MQTT message and decode it.
@@ -153,11 +186,12 @@ bool mqttDownloader_isDataBlockReceived( MqttFileDownloaderContext_t * context,
  *
  * @return returns True if the message is handled else False.
  */
+/* @[declare_mqttDownloader_processReceivedDataBlock] */
 bool mqttDownloader_processReceivedDataBlock(
     MqttFileDownloaderContext_t * context,
     uint8_t * message,
     size_t messageLength,
     uint8_t * data,
     size_t * dataLength );
-
+/* @[declare_mqttDownloader_processReceivedDataBlock] */
 #endif /* #ifndef MQTT_FILE_DOWNLOADER_H */

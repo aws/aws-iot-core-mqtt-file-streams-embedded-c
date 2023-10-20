@@ -7,12 +7,11 @@
  * the License.
  */
 
-/* Standard includes. */
-
 /**
  * @file MQTTFileDownloader.c
- * @brief CBOR encode/decode routines for AWS IoT Over-the-Air updates.
+ * @brief MQTT file streaming APIs.
  */
+/* Standard includes. */
 
 #include <assert.h>
 #include <stdbool.h>

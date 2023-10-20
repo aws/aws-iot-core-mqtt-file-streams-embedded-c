@@ -26,6 +26,32 @@ Currently, the MQTT files streams library has the following direct dependencies:
 */
 
 /**
+@page mqtt_stream_functions Functions
+@brief API functions of the MQTT File Streams library:<br><br>
+@subpage mqttDownloader_init_function <br>
+@subpage mqttDownloader_createGetDataBlockRequest_function <br>
+@subpage mqttDownloader_isDataBlockReceived_function <br>
+@subpage mqttDownloader_processReceivedDataBlock_function <br>
+
+@page mqttDownloader_init_function MQTTDownloader_Init
+@snippet MQTTFileDownloader.h declare_mqttDownloader_init
+@copydoc mqttDownloader_init
+
+@page mqttDownloader_createGetDataBlockRequest_function MQTTDownloader_createGetDataBlockRequest
+@snippet MQTTFileDownloader.h declare_mqttDownloader_createGetDataBlockRequest
+@copydoc mqttDownloader_createGetDataBlockRequest
+
+@page mqttDownloader_isDataBlockReceived_function MQTTDownloader_isDataBlockReceived
+@snippet MQTTFileDownloader.h declare_mqttDownloader_isDataBlockReceived
+@copydoc mqttDownloader_isDataBlockReceived
+
+@page mqttDownloader_processReceivedDataBlock_function MQTTDownloader_processReceivedDataBlock
+@snippet MQTTFileDownloader.h declare_mqttDownloader_processReceivedDataBlock
+@copydoc mqttDownloader_processReceivedDataBlock
+
+*/
+
+/**
 @defgroup mqtt_file_downloader_enum_types Enumerated Types
 @brief Enumerated types of the MQTT file streams downloader library.
 */
