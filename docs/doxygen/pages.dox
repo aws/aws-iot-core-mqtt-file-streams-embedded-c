@@ -1,11 +1,28 @@
 /**
 @mainpage Overview
 @anchor MQTT-File-Streams
-@brief MQTT file streams downloader library.
+@brief MQTT File Streams library.
 
-MQTT file streams library can be used to downloaded files from AWS mqtt streams. This library provides functionality
-to initalize the file downloader, request the file blocks and decoding the received file blocks.
+In AWS IoT, a stream is a publicly addressable resource that is an abstraction for a list of files that can be transferred to an IoT device.
+Using MQTT file streams library, files from a stream can be transfer to an IoT device. The file are transfered using MQTT protocol.
+It supports both JSON and CBOR format to send requests and receive data.
 
+This library uses GetStream API so that a device can receive stream files in small data blocks, so it can be used by those devices that have constraints
+on processing large block sizes. To receive an entire data file, a device needs to send or receive multiple requests and responses
+until all data blocks are received and processed.
+
+This library provides functionality to initalize the file streams downloader, create the request for file blocks and decode the received file blocks.
+
+@section ota_dependencies Workflow
+@brief MQTT file streaming Workflow
+
+@image html MqttStreams_flowChart.jpg
+
+@section mqtt_streaming_dependencies Library Dependencies
+
+Currently, the MQTT files streams library has the following direct dependencies:
+    - [coreJSON](https://github.com/FreeRTOS/coreJSON)
+    - [tinyCBOR](https://github.com/intel/tinycbor.git)
 */
 
 /**
