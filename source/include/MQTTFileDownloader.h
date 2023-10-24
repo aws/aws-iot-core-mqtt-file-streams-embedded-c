@@ -73,26 +73,14 @@ typedef enum
     DATA_TYPE_CBOR
 } DataType_t;
 
-typedef struct MqttFileDownloaderContext
+typedef struct
 {
     char topicStreamData[ TOPIC_STREAM_DATA_BUFFER_SIZE ];
     size_t topicStreamDataLength;
     char topicGetStream[ TOPIC_GET_STREAM_BUFFER_SIZE ];
     size_t topicGetStreamLength;
-    uint8_t dataType;
+    DataType_t dataType;
 } MqttFileDownloaderContext_t;
-
-/*
- * Structure to contain the data block information.
- */
-typedef struct MqttFileDownloaderDataBlockInfo
-{
-    uint8_t * payload;
-    size_t payloadLength;
-} MqttFileDownloaderDataBlockInfo_t;
-
-typedef void ( *MqttFileBlockHandler_t )(
-    MqttFileDownloaderDataBlockInfo_t * dataBlock );
 
 /**
  * Initializes the MQTT file downloader.
@@ -108,11 +96,11 @@ typedef void ( *MqttFileBlockHandler_t )(
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
 uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
-                             char * streamName,
+                             const char * streamName,
                              size_t streamNameLength,
-                             char * thingName,
+                             const char * thingName,
                              size_t thingNameLength,
-                             uint8_t dataType );
+                             DataType_t dataType );
 
 /**
  * Creates the get request for Data blocks from MQTT Streams.
@@ -127,7 +115,7 @@ uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
  * @return size_t returns Length of the get stream request.
  */
 size_t mqttDownloader_createGetDataBlockRequest(
-    uint8_t dataType,
+    DataType_t dataType,
     uint16_t fileId,
     uint32_t blockSize,
     uint16_t blockOffset,
@@ -143,7 +131,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
  *
  * @return returns True if the message contains Data block else False.
  */
-bool mqttDownloader_isDataBlockReceived( MqttFileDownloaderContext_t * context,
+bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
                                          char * topic,
                                          size_t topicLength );
 
@@ -156,7 +144,7 @@ bool mqttDownloader_isDataBlockReceived( MqttFileDownloaderContext_t * context,
  * @return returns True if the message is handled else False.
  */
 bool mqttDownloader_processReceivedDataBlock(
-    MqttFileDownloaderContext_t * context,
+    const MqttFileDownloaderContext_t * context,
     uint8_t * message,
     size_t messageLength,
     uint8_t * data,
