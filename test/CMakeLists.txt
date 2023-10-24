@@ -32,6 +32,18 @@ set(MODULE_ROOT_DIR
 
 include(FetchContent)
 
+# ====================================  Coverity Configuration 
+# ========================================
+# Include filepaths for source and include.
+include( ${MODULE_ROOT_DIR}/mqttFileDownloaderFilePaths.cmake )
+# Target for Coverity analysis that builds the library.
+add_library( coverity_analysis ${MQTT_FILE_DOWNLOADER_SOURCES} )
+# JOBS public include path.
+target_include_directories( coverity_analysis PUBLIC ${MQTT_FILE_DOWNLOADER_INCLUDES} )
+
+# Build HTTP library target without logging
+target_compile_options(coverity_analysis PUBLIC -DNDEBUG )
+
 FetchContent_Declare(
   CMock
   GIT_REPOSITORY https://github.com/ThrowTheSwitch/CMock.git
@@ -58,12 +70,13 @@ add_library(
   "${tinycbor_SOURCE_DIR}/src/cborencoder.c"
   "${tinycbor_SOURCE_DIR}/src/cborencoder_close_container_checked.c")
 target_include_directories(tinycbor PUBLIC "${tinycbor_SOURCE_DIR}/src")
+target_link_libraries(coverity_analysis PUBLIC tinycbor)
 
 # coreJSON
 include("${corejson_SOURCE_DIR}/jsonFilePaths.cmake")
 add_library(coreJSON ${JSON_SOURCES})
 target_include_directories(coreJSON PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS})
-
+target_link_libraries(coverity_analysis PUBLIC coreJSON)
 # cmock
 add_library(
   unity STATIC
