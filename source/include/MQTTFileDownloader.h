@@ -120,7 +120,8 @@ size_t mqttDownloader_createGetDataBlockRequest(
     uint32_t blockSize,
     uint16_t blockOffset,
     uint32_t numberOfBlocksRequested,
-    char * getStreamRequest );
+    char * getStreamRequest,
+    size_t getStreamRequestLength);
 
 /**
  * @brief Checks if the incoming Publish message contains MQTT Data block.

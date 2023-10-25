@@ -236,9 +236,10 @@ size_t mqttDownloader_createGetDataBlockRequest(
     uint32_t blockSize,
     uint16_t blockOffset,
     uint32_t numberOfBlocksRequested,
-    char * getStreamRequest )
+    char * getStreamRequest,
+    size_t getStreamRequestLength )
 {
-    size_t getStreamRequestLength = 0U;
+    size_t RequestLength = 0U;
     ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
 
     /*
@@ -246,8 +247,11 @@ size_t mqttDownloader_createGetDataBlockRequest(
      *
      *   "{ \"s\" : 1, \"f\": 1, \"l\": 256, \"o\": 0, \"n\": 1 }";
      */
-    if( dataType == DATA_TYPE_JSON )
+    if( ( dataType == DATA_TYPE_JSON ) && 
+        (getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE))
     {
+        
+        /* coverity[misra_c_2012_rule_21_6_violation] */
         ( void ) snprintf( getStreamRequest,
                   GET_STREAM_REQUEST_BUFFER_SIZE,
                   "{"
@@ -262,14 +266,14 @@ size_t mqttDownloader_createGetDataBlockRequest(
                   blockOffset,
                   numberOfBlocksRequested );
 
-        getStreamRequestLength = strnlen( getStreamRequest,
+        RequestLength = strnlen( getStreamRequest,
                                           GET_STREAM_REQUEST_BUFFER_SIZE );
     }
     else
     {
         ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
                                              GET_STREAM_REQUEST_BUFFER_SIZE,
-                                             &getStreamRequestLength,
+                                             &RequestLength,
                                              "rdy",
                                              fileId,
                                              blockSize,
@@ -280,7 +284,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
                                              numberOfBlocksRequested );
     }
 
-    return getStreamRequestLength;
+    return RequestLength;
 }
 
 static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,

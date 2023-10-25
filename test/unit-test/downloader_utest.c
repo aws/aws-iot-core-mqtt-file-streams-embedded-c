@@ -149,8 +149,9 @@ void test_init_returnsBadParam_givenNullContext( void )
 void test_createGetDataBlockRequest_succeedsForJSONDataType( void )
 {
     char getStreamRequest[ GET_STREAM_REQUEST_BUFFER_SIZE ];
+    size_t getStreamRequestLength = GET_STREAM_REQUEST_BUFFER_SIZE;
 
-    requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_JSON, 4U, 3U, 2U, 1U, getStreamRequest);
+    requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_JSON, 4U, 3U, 2U, 1U, getStreamRequest, getStreamRequestLength);
     TEST_ASSERT_EQUAL_INT(strlen("{\"s\": 1,\"f\": 4,\"l\": 3,\"o\": 2,\"n\": 1}"), requestLength);
     TEST_ASSERT_EQUAL_MEMORY(getStreamRequest, "{\"s\": 1,\"f\": 4,\"l\": 3,\"o\": 2,\"n\": 1}", strlen("{\"s\": 1,\"f\": 4,\"l\": 3,\"o\": 2,\"n\": 1}") );
 }
@@ -158,6 +159,7 @@ void test_createGetDataBlockRequest_succeedsForJSONDataType( void )
 void test_createGetDataBlockRequest_succeedsForCBORDataType( void )
 {
     char getStreamRequest[ GET_STREAM_REQUEST_BUFFER_SIZE ];
+    size_t getStreamRequestLength = GET_STREAM_REQUEST_BUFFER_SIZE;
 
     char *encodedMessage = "expected-message";
     size_t expectedCborSize = 9999U;
@@ -179,7 +181,7 @@ void test_createGetDataBlockRequest_succeedsForCBORDataType( void )
     CBOR_Encode_GetStreamRequestMessage_ReturnThruPtr_encodedMessageSize(&expectedCborSize);
     CBOR_Encode_GetStreamRequestMessage_ReturnThruPtr_messageBuffer(encodedMessage);
 
-    requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_CBOR, 4U, 3U, 2U, 1U, getStreamRequest);
+    requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_CBOR, 4U, 3U, 2U, 1U, getStreamRequest, getStreamRequestLength);
     TEST_ASSERT_EQUAL(expectedCborSize, requestLength);
     TEST_ASSERT_EQUAL_MEMORY(encodedMessage, "expected-message", strlen(encodedMessage));
 }
