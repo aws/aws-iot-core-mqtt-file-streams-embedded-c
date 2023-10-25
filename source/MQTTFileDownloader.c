@@ -240,8 +240,10 @@ size_t mqttDownloader_createGetDataBlockRequest(
     size_t getStreamRequestLength )
 {
     size_t RequestLength = 0U;
-    ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
-
+    if (getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE)
+    {
+        ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
+    }
     /*
      * Get stream request format
      *

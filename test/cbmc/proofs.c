@@ -44,6 +44,16 @@ static char * nondetStr( void )
     return ret;
 }
 
+DataType_t nondet_DataType_T( void )
+{
+    int Types[] = {DATA_TYPE_CBOR, DATA_TYPE_JSON};
+
+    int index = nondet_int();
+    __CPROVER_assume(index >= 0 && index <= (sizeof(Types)/ sizeof(Types[0]))-1);
+
+    return Types[index];
+}
+
 void proof_mqttDownloader_init( void )
 {
     MqttFileDownloaderContext_t context = {0};
@@ -51,7 +61,7 @@ void proof_mqttDownloader_init( void )
     size_t streamNameLength;
     char * thingName;
     size_t thingNameLength;
-    uint8_t dataType;
+    DataType_t dataType = nondet_DataType_T();
     uint8_t ret; 
 
     __CPROVER_assume( streamNameLength <= CBMC_STREAMNAME_MAX_LEN);
@@ -74,26 +84,24 @@ void proof_mqttDownloader_init( void )
 
 void proof_mqttDownloader_createGetDataBlockRequest( void )
 {
-    uint8_t dataType;
+    DataType_t dataType = nondet_DataType_T();
     uint16_t fileId;
     uint32_t blockSize;
     uint16_t blockOffset;
     uint32_t numberOfBlocksRequested;
     char * getStreamRequest; 
-    uint32_t getStreamRequestLength;
+    size_t getStreamRequestLength;
     size_t ret;
 
-    __CPROVER_assume(getStreamRequestLength >= 256);
     getStreamRequest = malloc(getStreamRequestLength);
-
-    __CPROVER_assume(dataType == DATA_TYPE_JSON || dataType == DATA_TYPE_CBOR); 
 
     ret = mqttDownloader_createGetDataBlockRequest(dataType,
                                                    fileId,
                                                    blockSize,
                                                    blockOffset,
                                                    numberOfBlocksRequested,
-                                                   getStreamRequest);
+                                                   getStreamRequest,
+                                                   getStreamRequestLength);
 
 }
 
