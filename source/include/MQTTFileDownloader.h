@@ -132,7 +132,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
  * @return returns True if the message contains Data block else False.
  */
 bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
-                                         char * topic,
+                                         const char * topic,
                                          size_t topicLength );
 
 /**
