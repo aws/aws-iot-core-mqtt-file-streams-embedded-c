@@ -63,7 +63,7 @@ static uint16_t createTopic( char * topicBuffer,
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
-static uint8_t handleCborMessage( uint8_t * decodedData,
+static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
                                   size_t * decodedDataLength,
                                   const uint8_t * message,
                                   size_t messageLength );
@@ -78,7 +78,7 @@ static uint8_t handleCborMessage( uint8_t * decodedData,
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
-static uint8_t handleJsonMessage( uint8_t * decodedData,
+static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
                                   size_t * decodedDataLength,
                                   uint8_t * message,
                                   size_t messageLength );
@@ -159,8 +159,8 @@ uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
                              size_t thingNameLength,
                              DataType_t dataType )
 {
-    char * streamDataApiSuffix = NULL;
-    char * getStreamApiSuffix = NULL;
+    const char * streamDataApiSuffix = NULL;
+    const char * getStreamApiSuffix = NULL;
     MQTTFileDownloaderStatus_t initStatus = MQTTFileDownloaderSuccess;
 
     if( context == NULL )
@@ -229,7 +229,7 @@ uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
         ( void ) printf( "Get stream topic is %s\n", context->topicGetStream );
     }
 
-    return ( size_t ) initStatus;
+    return ( uint8_t ) initStatus;
 }
 
 size_t mqttDownloader_createGetDataBlockRequest(
@@ -284,7 +284,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
     return getStreamRequestLength;
 }
 
-static uint8_t handleCborMessage( uint8_t * decodedData,
+static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
                                   size_t * decodedDataLength,
                                   const uint8_t * message,
                                   size_t messageLength )
@@ -318,7 +318,7 @@ static uint8_t handleCborMessage( uint8_t * decodedData,
     return handleStatus;
 }
 
-static uint8_t handleJsonMessage( uint8_t * decodedData,
+static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
                                   size_t * decodedDataLength,
                                   uint8_t * message,
                                   size_t messageLength )
