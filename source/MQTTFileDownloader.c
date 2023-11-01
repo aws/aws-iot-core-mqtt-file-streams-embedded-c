@@ -151,19 +151,19 @@ static uint16_t createTopic( char * topicBuffer,
     return topicLen;
 }
 
-/* TODO - Defend agains NULL streamName or thingName and 0 lengths*/
-uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
-                             const char * streamName,
-                             size_t streamNameLength,
-                             const char * thingName,
-                             size_t thingNameLength,
-                             DataType_t dataType )
+MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
+                                                const char * streamName,
+                                                size_t streamNameLength,
+                                                const char * thingName,
+                                                size_t thingNameLength,
+                                                DataType_t dataType )
 {
     const char * streamDataApiSuffix = NULL;
     const char * getStreamApiSuffix = NULL;
     MQTTFileDownloaderStatus_t initStatus = MQTTFileDownloaderSuccess;
 
-    if( context == NULL )
+    if ( ( streamName == NULL ) || ( streamNameLength == 0 ) || 
+         ( thingName == NULL) || (thingNameLength == 0) || ( context == NULL ))
     {
         initStatus = MQTTFileDownloaderBadParameter;
     }
@@ -227,7 +227,7 @@ uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
 
     }
 
-    return ( uint8_t ) initStatus;
+    return initStatus;
 }
 
 size_t mqttDownloader_createGetDataBlockRequest(
@@ -239,7 +239,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
     char * getStreamRequest,
     size_t getStreamRequestLength )
 {
-    size_t RequestLength = 0U;
+    size_t requestLength = 0U;
     if (getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE)
     {
         ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
@@ -268,14 +268,14 @@ size_t mqttDownloader_createGetDataBlockRequest(
                   blockOffset,
                   numberOfBlocksRequested );
 
-        RequestLength = strnlen( getStreamRequest,
+        requestLength = strnlen( getStreamRequest,
                                           GET_STREAM_REQUEST_BUFFER_SIZE );
     }
     else
     {
         ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
                                              GET_STREAM_REQUEST_BUFFER_SIZE,
-                                             &RequestLength,
+                                             &requestLength,
                                              "rdy",
                                              fileId,
                                              blockSize,
@@ -286,7 +286,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
                                              numberOfBlocksRequested );
     }
 
-    return RequestLength;
+    return requestLength;
 }
 
 static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
@@ -365,21 +365,24 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
     return handleStatus;
 }
 
-/* TODO - Handle NULL topic or zero topic length */
 bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
                                          const char * topic,
                                          size_t topicLength )
 {
     bool handled = false;
 
-    if( ( topicLength == context->topicStreamDataLength ) &&
+    if( ( topic == NULL ) || ( topicLength == 0 ) )
+    {
+        handled = false;
+    }
+    else if( ( topicLength == context->topicStreamDataLength ) &&
         ( 0 == strncmp( context->topicStreamData, topic, topicLength ) ) )
     {
         handled = true;
-    }
-    else
+    } 
+    else 
     {
-        handled = false;
+        /* Empty MISRA body */
     }
 
     return handled;

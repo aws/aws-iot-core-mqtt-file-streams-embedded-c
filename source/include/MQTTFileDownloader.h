@@ -93,9 +93,9 @@ typedef struct
  * @param[in] thingNameLength Length of the Thing name of the Device.
  * @param[in] dataType Either JSON or CBOR data type.
  *
- * @return uint8_t returns appropriate MQTT File Downloader Status.
+ * @return MQTTFileDownloaderStatus_t returns appropriate MQTT File Downloader Status.
  */
-uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
+MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
                              const char * streamName,
                              size_t streamNameLength,
                              const char * thingName,
