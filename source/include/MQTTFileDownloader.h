@@ -55,6 +55,7 @@
  */
 typedef enum
 {
+    MQTTFileDownloaderFailure,
     MQTTFileDownloaderSuccess,
     MQTTFileDownloaderBadParameter,
     MQTTFileDownloaderNotInitialized,
@@ -132,7 +133,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
  *
  * @return returns True if the message contains Data block else False.
  */
-bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
+MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
                                                                const char * topic,
                                                                size_t topicLength );
 
@@ -144,7 +145,7 @@ bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * con
  *
  * @return returns True if the message is handled else False.
  */
-bool mqttDownloader_processReceivedDataBlock(
+MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
     const MqttFileDownloaderContext_t * context,
     uint8_t * message,
     size_t messageLength,

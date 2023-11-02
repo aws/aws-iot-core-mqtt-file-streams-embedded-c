@@ -365,22 +365,19 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
     return handleStatus;
 }
 
-bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
+MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
                                                                const char * topic,
                                                                size_t topicLength )
 {
-    bool handled = false;
     MQTTFileDownloaderStatus_t status = MQTTFileDownloaderBadParameter;
 
     if( ( topic == NULL ) || ( topicLength == 0 ) )
     {
-        handled = false;
-        status = MQTTFileDownloaderBadParameter;
+        status = MQTTFileDownloaderFailure;
     }
     else if( ( topicLength == context->topicStreamDataLength ) &&
         ( 0 == strncmp( context->topicStreamData, topic, topicLength ) ) )
     {
-        handled = true;
         status = MQTTFileDownloaderSuccess;
     } 
     else 
@@ -388,17 +385,16 @@ bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * con
         /* Empty MISRA body */
     }
 
-    return handled;
+    return status;
 }
 
-bool mqttDownloader_processReceivedDataBlock(
+MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
     const MqttFileDownloaderContext_t * context,
     uint8_t * message,
     size_t messageLength,
     uint8_t * data,
     size_t * dataLength )
 {
-    bool processed = false;
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderSuccess;
 
     ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
@@ -417,10 +413,10 @@ bool mqttDownloader_processReceivedDataBlock(
                                             messageLength );
     }
 
-    if( decodingStatus == MQTTFileDownloaderSuccess )
+    if (decodingStatus != MQTTFileDownloaderSuccess)
     {
-        processed = true;
+        decodingStatus = MQTTFileDownloaderFailure;
     }
 
-    return processed;
+    return decodingStatus;
 }
