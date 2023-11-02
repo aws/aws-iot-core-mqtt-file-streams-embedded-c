@@ -7,7 +7,12 @@
  * the License.
  */
 
+/**
+ * @file MQTTFileDownloader.c
+ * @brief MQTT file streaming APIs.
+ */
 /* Standard includes. */
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
