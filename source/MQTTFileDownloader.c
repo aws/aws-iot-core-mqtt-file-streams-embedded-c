@@ -365,19 +365,22 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
     return handleStatus;
 }
 
-MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
+bool mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
                                                                const char * topic,
                                                                size_t topicLength )
 {
+    bool handled = false;
     MQTTFileDownloaderStatus_t status = MQTTFileDownloaderBadParameter;
 
     if( ( topic == NULL ) || ( topicLength == 0 ) )
     {
+        handled = false;
         status = MQTTFileDownloaderBadParameter;
     }
     else if( ( topicLength == context->topicStreamDataLength ) &&
         ( 0 == strncmp( context->topicStreamData, topic, topicLength ) ) )
     {
+        handled = true;
         status = MQTTFileDownloaderSuccess;
     } 
     else 
@@ -385,20 +388,20 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
         /* Empty MISRA body */
     }
 
-    return status;
+    return handled;
 }
 
-MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
+bool mqttDownloader_processReceivedDataBlock(
     const MqttFileDownloaderContext_t * context,
     uint8_t * message,
     size_t messageLength,
     uint8_t * data,
     size_t * dataLength )
 {
+    bool processed = false;
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderSuccess;
 
     ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
-
     if( context->dataType == DATA_TYPE_JSON )
     {
         decodingStatus = handleJsonMessage( data,
@@ -414,5 +417,10 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
                                             messageLength );
     }
 
-    return decodingStatus;
+    if( decodingStatus == MQTTFileDownloaderSuccess )
+    {
+        processed = true;
+    }
+
+    return processed;
 }
