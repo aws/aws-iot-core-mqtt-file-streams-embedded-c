@@ -240,52 +240,52 @@ size_t mqttDownloader_createGetDataBlockRequest(
     size_t getStreamRequestLength )
 {
     size_t requestLength = 0U;
-    if (getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE)
-    {
-        ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
-    }
     /*
      * Get stream request format
      *
      *   "{ \"s\" : 1, \"f\": 1, \"l\": 256, \"o\": 0, \"n\": 1 }";
      */
-    if( ( dataType == DATA_TYPE_JSON ) && 
-        (getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE))
+    if (( getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE ) ||
+        ( getStreamRequest != NULL ) )
     {
-        
-        /* coverity[misra_c_2012_rule_21_6_violation] */
-        ( void ) snprintf( getStreamRequest,
-                  GET_STREAM_REQUEST_BUFFER_SIZE,
-                  "{"
-                  "\"s\": 1,"
-                  "\"f\": %u,"
-                  "\"l\": %u,"
-                  "\"o\": %u,"
-                  "\"n\": %u"
-                  "}",
-                  fileId,
-                  blockSize,
-                  blockOffset,
-                  numberOfBlocksRequested );
+        ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
 
-        requestLength = strnlen( getStreamRequest,
+        if( ( dataType == DATA_TYPE_JSON ) )
+        {
+
+            /* coverity[misra_c_2012_rule_21_6_violation] */
+            ( void ) snprintf( getStreamRequest,
+                    GET_STREAM_REQUEST_BUFFER_SIZE,
+                    "{"
+                    "\"s\": 1,"
+                    "\"f\": %u,"
+                    "\"l\": %u,"
+                    "\"o\": %u,"
+                    "\"n\": %u"
+                    "}",
+                    fileId,
+                    blockSize,
+                    blockOffset,
+                    numberOfBlocksRequested );
+
+            requestLength = strnlen( getStreamRequest,
                                           GET_STREAM_REQUEST_BUFFER_SIZE );
-    }
-    else
-    {
-        ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
-                                             GET_STREAM_REQUEST_BUFFER_SIZE,
-                                             &requestLength,
-                                             "rdy",
-                                             fileId,
-                                             blockSize,
-                                             blockOffset,
-                                             /* coverity[misra_c_2012_rule_7_4_violation] */
-                                             ( const uint8_t * ) "MQ==",
-                                             strlen( "MQ==" ),
-                                             numberOfBlocksRequested );
-    }
-
+        }
+        else
+        {
+            ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
+                                                GET_STREAM_REQUEST_BUFFER_SIZE,
+                                                &requestLength,
+                                                "rdy",
+                                                fileId,
+                                                blockSize,
+                                                blockOffset,
+                                                /* coverity[misra_c_2012_rule_7_4_violation] */
+                                                ( const uint8_t * ) "MQ==",
+                                                strlen( "MQ==" ),
+                                                numberOfBlocksRequested );
+        }
+    } 
     return requestLength;
 }
 
@@ -369,11 +369,11 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
                                                                const char * topic,
                                                                size_t topicLength )
 {
-    MQTTFileDownloaderStatus_t status = MQTTFileDownloaderBadParameter;
+    MQTTFileDownloaderStatus_t status = MQTTFileDownloaderFailure;
 
     if( ( topic == NULL ) || ( topicLength == 0 ) )
     {
-        status = MQTTFileDownloaderFailure;
+        status = MQTTFileDownloaderBadParameter;
     }
     else if( ( topicLength == context->topicStreamDataLength ) &&
         ( 0 == strncmp( context->topicStreamData, topic, topicLength ) ) )
@@ -395,27 +395,24 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
     uint8_t * data,
     size_t * dataLength )
 {
-    MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderSuccess;
-
-    ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
-    if( context->dataType == DATA_TYPE_JSON )
+    MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderFailure;
+    if ( ( message == NULL ) || ( messageLength == 0 ) || ( data == NULL ) || ( dataLength == 0 ))
     {
-        decodingStatus = handleJsonMessage( data,
-                                            dataLength,
-                                            message,
-                                            messageLength );
-    }
-    else
-    {
-        decodingStatus = handleCborMessage( data,
-                                            dataLength,
-                                            message,
-                                            messageLength );
-    }
-
-    if (decodingStatus != MQTTFileDownloaderSuccess)
-    {
-        decodingStatus = MQTTFileDownloaderFailure;
+        ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
+        if( context->dataType == DATA_TYPE_JSON )
+        {
+            decodingStatus = handleJsonMessage( data,
+                                                dataLength,
+                                                message,
+                                                messageLength );
+        }
+        else
+        {
+            decodingStatus = handleCborMessage( data,
+                                                dataLength,
+                                                message,
+                                                messageLength );
+        }
     }
 
     return decodingStatus;
