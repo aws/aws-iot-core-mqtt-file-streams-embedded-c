@@ -255,7 +255,7 @@ size_t mqttDownloader_createGetDataBlockRequest(
     {
         ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
 
-        if( ( dataType == DATA_TYPE_JSON ) )
+        if( dataType == DATA_TYPE_JSON )
         {
 
             /* coverity[misra_c_2012_rule_21_6_violation] */
