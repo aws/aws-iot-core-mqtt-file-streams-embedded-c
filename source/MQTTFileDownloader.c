@@ -250,17 +250,17 @@ size_t mqttDownloader_createGetDataBlockRequest(
      *
      *   "{ \"s\" : 1, \"f\": 1, \"l\": 256, \"o\": 0, \"n\": 1 }";
      */
-    if (( getStreamRequestLength >= mqttFileDownloader_CONFIG_BLOCK_SIZE ) &&
+    if (( getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE ) &&
         ( getStreamRequest != NULL ) )
     {
-        ( void ) memset( getStreamRequest, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
+        ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
 
         if( dataType == DATA_TYPE_JSON )
         {
 
             /* coverity[misra_c_2012_rule_21_6_violation] */
             ( void ) snprintf( getStreamRequest,
-                    mqttFileDownloader_CONFIG_BLOCK_SIZE,
+                    GET_STREAM_REQUEST_BUFFER_SIZE,
                     "{"
                     "\"s\": 1,"
                     "\"f\": %u,"
@@ -274,12 +274,12 @@ size_t mqttDownloader_createGetDataBlockRequest(
                     numberOfBlocksRequested );
 
             requestLength = strnlen( getStreamRequest,
-                                          mqttFileDownloader_CONFIG_BLOCK_SIZE );
+                                          GET_STREAM_REQUEST_BUFFER_SIZE );
         }
         else
         {
             ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
-                                                mqttFileDownloader_CONFIG_BLOCK_SIZE,
+                                                GET_STREAM_REQUEST_BUFFER_SIZE,
                                                 &requestLength,
                                                 "rdy",
                                                 fileId,

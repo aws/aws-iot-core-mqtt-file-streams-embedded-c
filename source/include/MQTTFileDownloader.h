@@ -51,6 +51,12 @@
 
 /**
  * @ingroup mqtt_file_downloader_const_types
+ * Stream Request Buffer Size
+*/
+#define GET_STREAM_REQUEST_BUFFER_SIZE 256U
+
+/**
+ * @ingroup mqtt_file_downloader_const_types
  * @brief Configure the Maximum size of the data payload.
  */
 #define mqttFileDownloader_CONFIG_BLOCK_SIZE 256U
