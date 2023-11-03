@@ -396,7 +396,7 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
     size_t * dataLength )
 {
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderFailure;
-    if ( ( message == NULL ) || ( messageLength == 0 ) || ( data == NULL ) || ( dataLength == 0 ))
+    if ( ( message != NULL ) && ( messageLength != 0 ) && ( data != NULL ) && ( dataLength != 0 ))
     {
         ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
         if( context->dataType == DATA_TYPE_JSON )
