@@ -85,6 +85,7 @@
  */
 typedef enum
 {
+    MQTTFileDownloaderFailure,                  /**< Failure. */
     MQTTFileDownloaderSuccess,                  /**< Success. */
     MQTTFileDownloaderBadParameter,             /**< Bad Parameter. */
     MQTTFileDownloaderNotInitialized,           /**< Downloader not initalized. */
@@ -108,7 +109,7 @@ typedef enum
  * @ingroup mqtt_file_downloader_struct_types
  * @brief Strucure to mqtt file downloader context.
  */
-typedef struct MqttFileDownloaderContext
+typedef struct
 {
     char topicStreamData[ TOPIC_STREAM_DATA_BUFFER_SIZE ];      /**< Stream data MQTT topic. */
     size_t topicStreamDataLength;                               /**< Stream data MQTT topic length. */
@@ -127,15 +128,15 @@ typedef struct MqttFileDownloaderContext
  * @param[in] thingNameLength Length of the Thing name of the Device.
  * @param[in] dataType Either JSON or CBOR data type.
  *
- * @return uint8_t returns appropriate MQTT File Downloader Status.
+ * @return MQTTFileDownloaderStatus_t returns appropriate MQTT File Downloader Status.
  */
 /* @[declare_mqttDownloader_init] */
-uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
-                             char * streamName,
+MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
+                             const char * streamName,
                              size_t streamNameLength,
-                             char * thingName,
+                             const char * thingName,
                              size_t thingNameLength,
-                             uint8_t dataType );
+                             DataType_t dataType );
 /* @[declare_mqttDownloader_init] */
 
 /**
@@ -152,12 +153,13 @@ uint8_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
  */
 /* @[declare_mqttDownloader_createGetDataBlockRequest] */
 size_t mqttDownloader_createGetDataBlockRequest(
-    uint8_t dataType,
+    DataType_t dataType,
     uint16_t fileId,
     uint32_t blockSize,
     uint16_t blockOffset,
     uint32_t numberOfBlocksRequested,
-    char * getStreamRequest );
+    char * getStreamRequest,
+    size_t getStreamRequestLength);
 /* @[declare_mqttDownloader_createGetDataBlockRequest] */
 
 /**
@@ -170,9 +172,9 @@ size_t mqttDownloader_createGetDataBlockRequest(
  * @return returns True if the message contains Data block else False.
  */
 /* @[declare_mqttDownloader_isDataBlockReceived] */
-bool mqttDownloader_isDataBlockReceived( MqttFileDownloaderContext_t * context,
-                                         char * topic,
-                                         size_t topicLength );
+MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDownloaderContext_t * context,
+                                                               const char * topic,
+                                                               size_t topicLength );
 /* @[declare_mqttDownloader_isDataBlockReceived] */
 
 /**
@@ -187,8 +189,8 @@ bool mqttDownloader_isDataBlockReceived( MqttFileDownloaderContext_t * context,
  * @return returns True if the message is handled else False.
  */
 /* @[declare_mqttDownloader_processReceivedDataBlock] */
-bool mqttDownloader_processReceivedDataBlock(
-    MqttFileDownloaderContext_t * context,
+MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
+    const MqttFileDownloaderContext_t * context,
     uint8_t * message,
     size_t messageLength,
     uint8_t * data,
