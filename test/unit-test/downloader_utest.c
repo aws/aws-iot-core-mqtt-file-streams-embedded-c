@@ -240,9 +240,9 @@ void test_processReceivedDataBlock_invalidJSONBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    bool result = mqttDownloader_processReceivedDataBlock(&context, "{\"wrongKey\": \"dGVzdA==\"}", strlen("{\"wrongKey\": \"dGVzdA==\"}"), decodedData, &dataLength);
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock(&context, "{\"wrongKey\": \"dGVzdA==\"}", strlen("{\"wrongKey\": \"dGVzdA==\"}"), decodedData, &dataLength);
 
-    TEST_ASSERT_FALSE(result);
+    TEST_ASSERT_EQUAL(7, result);
     TEST_ASSERT_EQUAL(0, dataLength);
 }
 
@@ -254,9 +254,9 @@ void test_processReceivedDataBlock_invalidEncodingJSONBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    bool result = mqttDownloader_processReceivedDataBlock(&context, "{\"p\": \"notEncoded\"}", strlen("{\"p\": \"notEncoded\"}"), decodedData, &dataLength);
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock(&context, "{\"p\": \"notEncoded\"}", strlen("{\"p\": \"notEncoded\"}"), decodedData, &dataLength);
 
-    TEST_ASSERT_FALSE(result);
+    TEST_ASSERT_EQUAL(7, result);
     TEST_ASSERT_EQUAL(0, dataLength);
 }
 
@@ -302,8 +302,8 @@ void test_processReceivedDataBlock_invalidCBORBlock( void )
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_payloadSize();
     CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_payloadSize(&notExpectedProcessedDataLength);
 
-    bool result = mqttDownloader_processReceivedDataBlock(&context, invalidCBORMsg, strlen(invalidCBORMsg), decodedData, &dataLength);
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock(&context, invalidCBORMsg, strlen(invalidCBORMsg), decodedData, &dataLength);
 
-    TEST_ASSERT_FALSE(result);
+    TEST_ASSERT_EQUAL(7, result);
     TEST_ASSERT_EQUAL(0, dataLength);
 }
