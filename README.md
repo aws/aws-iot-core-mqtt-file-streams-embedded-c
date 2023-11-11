@@ -47,7 +47,7 @@ The [mqttFileDownloaderFilePaths.cmake](mqttFileDownloaderFilePaths.cmake) file 
 To learn more about CBMC and proofs specifically, review the training material
 [here](https://model-checking.github.io/cbmc-training).
 
-The `test/cbmc/proofs` directory contains CBMC proofs.
+The `test/cbmc` directory contains CBMC proofs.
 
 In order to run these proofs you will need to install CBMC and other tools by
 following the instructions
