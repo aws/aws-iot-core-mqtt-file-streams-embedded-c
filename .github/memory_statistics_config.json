@@ -3,9 +3,11 @@
     "src": [
         "source/MQTTFileDownloader.c",
         "source/MQTTFileDownloader_cbor.c",
-        "source/MQTTFileDownloader_base64.c"
+        "source/MQTTFileDownloader_base64.c",
+        "coreJSON/source/core_json.c"
     ],
     "include": [
-        "source/include"
+        "source/include",
+        "coreJSON/source/include"
     ]
 }
