@@ -89,6 +89,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Clone coreJSON
         run: git clone https://github.com/FreeRTOS/coreJSON.git --depth 1 --branch v3.2.0
+      - name: Clone tinycbor
+        run: https://github.com/intel/tinycbor.git
       - name: Install Python3
         uses: actions/setup-python@v3
         with:
