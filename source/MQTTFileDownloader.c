@@ -133,11 +133,11 @@ static uint16_t createTopic( char * topicBuffer,
     const char * topicParts[] =
     {
         MQTT_API_THINGS,
-        NULL,                           /* Thing Name not available at compile
-                                         * time, initialized below. */
+        NULL, /* Thing Name not available at compile
+               * time, initialized below. */
         MQTT_API_STREAMS,
-        NULL,                           /* Stream Name not available at compile
-                                         * time, initialized below.*/
+        NULL, /* Stream Name not available at compile
+               * time, initialized below.*/
         NULL,
         NULL
     };
