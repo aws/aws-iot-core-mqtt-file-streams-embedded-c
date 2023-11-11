@@ -35,7 +35,7 @@ size_t requestLength;
 /* Called before each test method. */
 void setUp()
 {
-    uintResult = 10; // An unimplimented MQTTFileDownloaderStatus value
+    uintResult = 10; // An unimplemented MQTTFileDownloaderStatus value
 }
 
 /* Called after each test method. */

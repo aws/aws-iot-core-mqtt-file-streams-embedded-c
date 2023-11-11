@@ -410,7 +410,7 @@ void test_Decode_returnsFalse_blockPayloadWrongTypeInMap( void )
     TEST_ASSERT_FALSE(result);
 }
 
-void test_Decode_returnsFalse_cannotCalulateBlockPayloadLengthString( void )
+void test_Decode_returnsFalse_cannotCalculateBlockPayloadLengthString( void )
 {
     cborInitializesSuccessful();
     cbor_value_is_map_ExpectAndReturn(&cborMap, true);
