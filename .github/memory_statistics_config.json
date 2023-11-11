@@ -1,0 +1,11 @@
+{
+    "lib_name": "AWS IOT Core MQTT File Stream Embedded C",
+    "src": [
+        "source/MQTTFileDownloader.c",
+        "source/MQTTFileDownloader_cbor.c",
+        "source/MQTTFileDownloader_base64.c"
+    ],
+    "include": [
+        "source/include"
+    ]
+}
