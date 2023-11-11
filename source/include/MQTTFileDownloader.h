@@ -154,6 +154,7 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
  * @param[in] blockOffset Block Offset.
  * @param[in] numberOfBlocksRequested Number of Blocks requested per request.
  * @param[out] getStreamRequest Buffer to store the get stream request.
+ * @param[in] getStreamRequestLength Length of getStreamRequest buffer
  *
  * @return size_t returns Length of the get stream request.
  */
