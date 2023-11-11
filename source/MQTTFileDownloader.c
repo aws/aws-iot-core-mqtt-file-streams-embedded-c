@@ -69,9 +69,9 @@ static uint16_t createTopic( char * topicBuffer,
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
 static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
-                                  size_t * decodedDataLength,
-                                  const uint8_t * message,
-                                  size_t messageLength );
+                                                     size_t * decodedDataLength,
+                                                     const uint8_t * message,
+                                                     size_t messageLength );
 
 /**
  * @brief Handles and decodes the received message in JSON format.
@@ -84,9 +84,9 @@ static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
 static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
-                                  size_t * decodedDataLength,
-                                  uint8_t * message,
-                                  size_t messageLength );
+                                                     size_t * decodedDataLength,
+                                                     uint8_t * message,
+                                                     size_t messageLength );
 
 static size_t stringBuilder( char * buffer,
                              size_t bufferSizeBytes,
@@ -130,14 +130,17 @@ static uint16_t createTopic( char * topicBuffer,
     char thingNameBuff[ MAX_THINGNAME_LEN + 1 ];
 
     /* NULL-terminated list of topic string parts. */
-    const char * topicParts[] = { MQTT_API_THINGS,
-                                  NULL, /* Thing Name not available at compile
-                                           time, initialized below. */
-                                  MQTT_API_STREAMS,
-                                  NULL, /* Stream Name not available at compile
-                                           time, initialized below.*/
-                                  NULL,
-                                  NULL };
+    const char * topicParts[] =
+    {
+        MQTT_API_THINGS,
+        NULL,                           /* Thing Name not available at compile
+                                         * time, initialized below. */
+        MQTT_API_STREAMS,
+        NULL,                           /* Stream Name not available at compile
+                                         * time, initialized below.*/
+        NULL,
+        NULL
+    };
 
     ( void ) memset( streamNameBuff, ( int32_t ) '\0', STREAM_NAME_MAX_LEN + 1U );
     ( void ) memcpy( streamNameBuff, streamName, streamNameLength );
@@ -167,8 +170,8 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
     const char * getStreamApiSuffix = NULL;
     MQTTFileDownloaderStatus_t initStatus = MQTTFileDownloaderSuccess;
 
-    if ( ( streamName == NULL ) || ( streamNameLength == 0 ) || 
-         ( thingName == NULL) || (thingNameLength == 0) || ( context == NULL ))
+    if( ( streamName == NULL ) || ( streamNameLength == 0 ) ||
+        ( thingName == NULL ) || ( thingNameLength == 0 ) || ( context == NULL ) )
     {
         initStatus = MQTTFileDownloaderBadParameter;
     }
@@ -199,11 +202,11 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
             thingName,
             thingNameLength,
             streamDataApiSuffix );
+
         if( context->topicStreamDataLength == 0U )
         {
             initStatus = MQTTFileDownloaderInitFailed;
         }
-
     }
 
     if( initStatus == MQTTFileDownloaderSuccess )
@@ -218,86 +221,86 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
         }
 
         context
-            ->topicGetStreamLength = createTopic( context->topicGetStream,
-                                                  TOPIC_GET_STREAM_BUFFER_SIZE,
-                                                  streamName,
-                                                  streamNameLength,
-                                                  thingName,
-                                                  thingNameLength,
-                                                  getStreamApiSuffix );
+           ->topicGetStreamLength = createTopic( context->topicGetStream,
+                                                 TOPIC_GET_STREAM_BUFFER_SIZE,
+                                                 streamName,
+                                                 streamNameLength,
+                                                 thingName,
+                                                 thingNameLength,
+                                                 getStreamApiSuffix );
+
         if( context->topicGetStreamLength == 0U )
         {
             initStatus = MQTTFileDownloaderInitFailed;
         }
-
     }
 
     return initStatus;
 }
 
-size_t mqttDownloader_createGetDataBlockRequest(
-    DataType_t dataType,
-    uint16_t fileId,
-    uint32_t blockSize,
-    uint16_t blockOffset,
-    uint32_t numberOfBlocksRequested,
-    char * getStreamRequest,
-    size_t getStreamRequestLength )
+size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
+                                                 uint16_t fileId,
+                                                 uint32_t blockSize,
+                                                 uint16_t blockOffset,
+                                                 uint32_t numberOfBlocksRequested,
+                                                 char * getStreamRequest,
+                                                 size_t getStreamRequestLength )
 {
     size_t requestLength = 0U;
+
     /*
      * Get stream request format
      *
      *   "{ \"s\" : 1, \"f\": 1, \"l\": 256, \"o\": 0, \"n\": 1 }";
      */
-    if (( getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE ) &&
+    if( ( getStreamRequestLength >= GET_STREAM_REQUEST_BUFFER_SIZE ) &&
         ( getStreamRequest != NULL ) )
     {
         ( void ) memset( getStreamRequest, ( int32_t ) '\0', GET_STREAM_REQUEST_BUFFER_SIZE );
 
         if( dataType == DATA_TYPE_JSON )
         {
-
             /* coverity[misra_c_2012_rule_21_6_violation] */
             ( void ) snprintf( getStreamRequest,
-                    GET_STREAM_REQUEST_BUFFER_SIZE,
-                    "{"
-                    "\"s\": 1,"
-                    "\"f\": %u,"
-                    "\"l\": %u,"
-                    "\"o\": %u,"
-                    "\"n\": %u"
-                    "}",
-                    fileId,
-                    blockSize,
-                    blockOffset,
-                    numberOfBlocksRequested );
+                               GET_STREAM_REQUEST_BUFFER_SIZE,
+                               "{"
+                               "\"s\": 1,"
+                               "\"f\": %u,"
+                               "\"l\": %u,"
+                               "\"o\": %u,"
+                               "\"n\": %u"
+                               "}",
+                               fileId,
+                               blockSize,
+                               blockOffset,
+                               numberOfBlocksRequested );
 
             requestLength = strnlen( getStreamRequest,
-                                          GET_STREAM_REQUEST_BUFFER_SIZE );
+                                     GET_STREAM_REQUEST_BUFFER_SIZE );
         }
         else
         {
             ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
-                                                GET_STREAM_REQUEST_BUFFER_SIZE,
-                                                &requestLength,
-                                                "rdy",
-                                                fileId,
-                                                blockSize,
-                                                blockOffset,
-                                                /* coverity[misra_c_2012_rule_7_4_violation] */
-                                                ( const uint8_t * ) "MQ==",
-                                                strlen( "MQ==" ),
-                                                numberOfBlocksRequested );
+                                                          GET_STREAM_REQUEST_BUFFER_SIZE,
+                                                          &requestLength,
+                                                          "rdy",
+                                                          fileId,
+                                                          blockSize,
+                                                          blockOffset,
+                                                          /* coverity[misra_c_2012_rule_7_4_violation] */
+                                                          ( const uint8_t * ) "MQ==",
+                                                          strlen( "MQ==" ),
+                                                          numberOfBlocksRequested );
         }
-    } 
+    }
+
     return requestLength;
 }
 
 static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
-                                  size_t * decodedDataLength,
-                                  const uint8_t * message,
-                                  size_t messageLength )
+                                                     size_t * decodedDataLength,
+                                                     const uint8_t * message,
+                                                     size_t messageLength )
 {
     bool cborDecodeRet = false;
     int32_t fileId = 0;
@@ -328,9 +331,9 @@ static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
 }
 
 static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
-                                  size_t * decodedDataLength,
-                                  uint8_t * message,
-                                  size_t messageLength )
+                                                     size_t * decodedDataLength,
+                                                     uint8_t * message,
+                                                     size_t messageLength )
 {
     const char dataQuery[] = "p";
     size_t dataQueryLength = sizeof( dataQuery ) - 1U;
@@ -381,11 +384,11 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
         status = MQTTFileDownloaderBadParameter;
     }
     else if( ( topicLength == context->topicStreamDataLength ) &&
-        ( 0 == strncmp( context->topicStreamData, topic, topicLength ) ) )
+             ( 0 == strncmp( context->topicStreamData, topic, topicLength ) ) )
     {
         status = MQTTFileDownloaderSuccess;
-    } 
-    else 
+    }
+    else
     {
         /* Empty MISRA body */
     }
@@ -393,17 +396,18 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
     return status;
 }
 
-MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
-    const MqttFileDownloaderContext_t * context,
-    uint8_t * message,
-    size_t messageLength,
-    uint8_t * data,
-    size_t * dataLength )
+MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFileDownloaderContext_t * context,
+                                                                    uint8_t * message,
+                                                                    size_t messageLength,
+                                                                    uint8_t * data,
+                                                                    size_t * dataLength )
 {
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderFailure;
-    if ( ( message != NULL ) && ( messageLength != 0 ) && ( data != NULL ) && ( dataLength != 0 ))
+
+    if( ( message != NULL ) && ( messageLength != 0 ) && ( data != NULL ) && ( dataLength != 0 ) )
     {
         ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
+
         if( context->dataType == DATA_TYPE_JSON )
         {
             decodingStatus = handleJsonMessage( data,

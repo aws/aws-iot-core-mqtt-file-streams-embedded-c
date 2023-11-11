@@ -32,7 +32,7 @@ set(MODULE_ROOT_DIR
 
 include(FetchContent)
 
-# ====================================  Coverity Configuration 
+# ====================================  Coverity Configuration
 # ========================================
 # Include filepaths for source and include.
 include( ${MODULE_ROOT_DIR}/mqttFileDownloaderFilePaths.cmake )
