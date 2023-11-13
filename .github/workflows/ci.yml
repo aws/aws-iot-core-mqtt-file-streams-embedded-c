@@ -125,7 +125,7 @@ jobs:
           fail-on-incorrect-version: true
 
   proof_ci:
-    # if: ${{ github.event.pull_request }}
+    if: ${{ github.event.pull_request }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up CBMC runner
