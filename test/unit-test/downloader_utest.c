@@ -154,6 +154,38 @@ void test_init_returnsBadParam_givenNullContext( void )
     TEST_ASSERT_EQUAL( MQTTFileDownloaderBadParameter, uintResult );
 }
 
+void test_init_returnsBadParam_givenNullStreamName( void )
+{
+    MqttFileDownloaderContext_t context = {0};
+    uintResult = mqttDownloader_init( &context, NULL, streamNameLength, thingName, thingNameLength, DATA_TYPE_JSON );
+
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderBadParameter, uintResult );
+}
+
+void test_init_returnsBadParam_givenZeroStreamNameLength( void )
+{
+    MqttFileDownloaderContext_t context = {0};
+    uintResult = mqttDownloader_init( &context, streamName, 0, thingName, thingNameLength, DATA_TYPE_JSON );
+
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderBadParameter, uintResult );
+}
+
+void test_init_returnsBadParam_givenNullThingName( void )
+{
+    MqttFileDownloaderContext_t context = {0};
+    uintResult = mqttDownloader_init( &context, streamName, streamNameLength, NULL, thingNameLength, DATA_TYPE_JSON );
+
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderBadParameter, uintResult );
+}
+
+void test_init_returnsBadParam_givenZeroThingNameLength( void )
+{
+    MqttFileDownloaderContext_t context = {0};
+    uintResult = mqttDownloader_init( &context, streamName, streamNameLength, thingName, 0, DATA_TYPE_JSON );
+
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderBadParameter, uintResult );
+}
+
 void test_createGetDataBlockRequest_succeedsForJSONDataType( void )
 {
     char getStreamRequest[ GET_STREAM_REQUEST_BUFFER_SIZE ];
