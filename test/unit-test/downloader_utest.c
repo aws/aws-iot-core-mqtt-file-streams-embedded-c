@@ -234,13 +234,13 @@ void test_isDataBlockReceived_returnsFalse_whenTopicAndLengthIsDifferent( void )
 void test_isDataBlockReceived_returnsBadParam_whenTopicIsNull( void )
 {
     MqttFileDownloaderContext_t context = { 0 };
-    TEST_ASSERT_EQUAL(MQTTFileDownloaderBadParameter, mqttDownloader_isDataBlockReceived(&context, NULL, strlen("topic")));
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderBadParameter, mqttDownloader_isDataBlockReceived( &context, NULL, strlen( "topic" ) ) );
 }
 
 void test_isDataBlockReceived_returnsBadParam_whenTopicLengthIsZero( void )
 {
     MqttFileDownloaderContext_t context = { 0 };
-    TEST_ASSERT_EQUAL(MQTTFileDownloaderBadParameter, mqttDownloader_isDataBlockReceived(&context, "topic", 0));
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderBadParameter, mqttDownloader_isDataBlockReceived( &context, "topic", 0 ) );
 }
 
 void test_processReceivedDataBlock_processesJSONBlock( void )
@@ -336,4 +336,44 @@ void test_processReceivedDataBlock_invalidCBORBlock( void )
 
     TEST_ASSERT_EQUAL( 7, result );
     TEST_ASSERT_EQUAL( 0, dataLength );
+}
+
+void test_processReceivedDataBlock_returnsFailureWhenMessageIsNull( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, NULL, strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, &dataLength );
+    TEST_ASSERT_EQUAL(MQTTFileDownloaderFailure, uintResult);
+
+}
+
+void test_processReceivedDataBlock_returnsFailureWhenMessageLengthZero( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", 0U, decodedData, &dataLength );
+    TEST_ASSERT_EQUAL(MQTTFileDownloaderFailure, uintResult);
+}
+
+void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ) , NULL, &dataLength );
+    TEST_ASSERT_EQUAL(MQTTFileDownloaderFailure, uintResult);
 }
