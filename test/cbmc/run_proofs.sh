@@ -23,5 +23,5 @@ exec cbmc stubs/strnlen.c stubs/JSON_SearchT.c stubs/tinycbor.c proofs.c \
      --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check \
      --conversion-check --undefined-shift-check --enum-range-check \
      --pointer-primitive-check --drop-unused-functions --nondet-static \
-     --unwinding-assertions --c99 --trace "$@" --unwind "$UNWIND_COUNT"  \
-     -DUNWIND_COUNT="$UNWIND_COUNT" >&1 | tee output/latest/html/cbmcOutput.txt
+     --unwinding-assertions --c99 "$@" --unwind "$UNWIND_COUNT" --json-ui \
+     -DUNWIND_COUNT="$UNWIND_COUNT" >&1 | tee output/latest/html/run.json
