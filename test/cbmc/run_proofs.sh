@@ -17,8 +17,8 @@ exec cbmc stubs/strnlen.c stubs/JSON_SearchT.c stubs/tinycbor.c proofs.c \
      $MQTTStreamingSourceDir/MQTTFileDownloader_base64.c \
      -I $MQTTStreamingSourceDir/include -I coreJSON/source/include  -I include \
      --unwindset strlen.0:36 \
-     --unwindset __builtin___strncat_chk.0:192 \
-     --unwindset __builtin___strncat_chk.1:205 \
+     --strncat.0:192 \
+     --strncat.1:205 \
      --bounds-check --pointer-check --memory-cleanup-check --div-by-zero-check \
      --signed-overflow-check --unsigned-overflow-check --pointer-overflow-check \
      --conversion-check --undefined-shift-check --enum-range-check \
