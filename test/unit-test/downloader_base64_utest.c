@@ -15,6 +15,7 @@
 #include "MQTTFileDownloader.h"
 
 #include "MQTTFileDownloader_base64.h"
+#include "MQTTFileDownloader_base64_annex.h"
 
 #define GET_STREAM_REQUEST_BUFFER_SIZE    256U
 

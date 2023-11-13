@@ -31,14 +31,42 @@ list(APPEND mock_define_list "")
 
 # ================= Create the library under test here (edit) ==================
 
+# Base name for temporary files
+set( TEMP_BASE "${CMAKE_BINARY_DIR}/MQTTFileDownloader_base64" )
+
+# Strip static constraints so unit tests may call internal functions
+execute_process( COMMAND sed "s/^static //"
+                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                 INPUT_FILE ../source/MQTTFileDownloader_base64.c
+                 OUTPUT_FILE ${TEMP_BASE}.c
+        )
+
+# Generate a header file for internal functions
+execute_process( COMMAND sed -n "/^static.*(/,/^{\$/{s/^static //; s/)\$/&;/; /{/d; p;}"
+                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                 INPUT_FILE ../source/MQTTFileDownloader_base64.c
+                 OUTPUT_FILE ${TEMP_BASE}_annex.h
+        )
+
+execute_process(COMMAND cp ./source/MQTTFileDownloader.c ./build/MQTTFileDownloader.c )
+
+execute_process(COMMAND cp ./source/MQTTFileDownloader_cbor.c ./build/MQTTFileDownloader_cbor.c )
+
+set (TEST_SOURCES
+         ${MODULE_ROOT_DIR}/build/MQTTFileDownloader.c
+         ${MODULE_ROOT_DIR}/build/MQTTFileDownloader_base64.c
+         ${MODULE_ROOT_DIR}/build/MQTTFileDownloader_cbor.c)
+
 # list the files you would like to test here
-list(APPEND real_source_files ${MQTT_FILE_DOWNLOADER_SOURCES} ${JSON_SOURCES} ${TINYCBOR_SOURCES})
+list(APPEND real_source_files ${TEST_SOURCES} ${JSON_SOURCES} ${TINYCBOR_SOURCES})
 # list the directories the module under test includes
 list(APPEND real_include_directories .
     ${MQTT_FILE_DOWNLOADER_INCLUDES}
     ${JSON_INCLUDE_PUBLIC_DIRS}
+    "${MODULE_ROOT_DIR}/build/"
     "${MODULE_ROOT_DIR}/test/unit-test/dependencies/"
 )
+
 
 # =====================  Create UnitTest Code here (edit)  =====================
 
