@@ -33,6 +33,7 @@ list(APPEND mock_define_list "")
 
 # list the files you would like to test here
 list(APPEND real_source_files ${MQTT_FILE_DOWNLOADER_SOURCES} ${JSON_SOURCES} ${TINYCBOR_SOURCES})
+list(APPEND real_source_files ${TEST_SOURCES} ${JSON_SOURCES} ${TINYCBOR_SOURCES})
 # list the directories the module under test includes
 list(APPEND real_include_directories .
     ${MQTT_FILE_DOWNLOADER_INCLUDES}

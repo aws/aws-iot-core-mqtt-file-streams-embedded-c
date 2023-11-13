@@ -19,88 +19,88 @@
  * @brief Number to represent both line feed and carriage return symbols in the
  *        base64SymbolToIndexMap table.
  */
-#define NEWLINE                               64U
+#define NEWLINE                                  64U
 
 /**
  * @brief Number to represent the whitespace character in the
  * base64SymbolToIndexMap table.
  */
-#define WHITESPACE                            65U
+#define WHITESPACE                               65U
 
 /**
  * @brief Number to represent the Base64 padding symbol in the
  * base64SymbolToIndexMap table.
  */
-#define PADDING_SYMBOL                        66U
+#define PADDING_SYMBOL                           66U
 
 /**
  * @brief Number to represent values that are invalid in the
  * base64SymbolToIndexMap table.
  */
-#define NON_BASE64_INDEX                      67U
+#define NON_BASE64_INDEX                         67U
 
 /**
  * @brief Maximum value for a Base64 index that represents a valid,
  * non-formatting Base64 symbol.
  */
-#define VALID_BASE64_SYMBOL_INDEX_RANGE_MAX   63U
+#define VALID_BASE64_SYMBOL_INDEX_RANGE_MAX      63U
 
 /**
  * @brief Number of bits in a sextet.
  */
-#define SEXTET_SIZE                           6
+#define SEXTET_SIZE                              6
 
 /**
  * @brief Maximum number of Base64 symbols to store in a buffer before decoding
  * them.
  */
-#define MAX_NUM_BASE64_DATA                   4U
+#define MAX_NUM_BASE64_DATA                      4U
 
 /**
  * @brief Maximum number of padding symbols in a string of encoded data that is
  * considered valid.
  */
-#define MAX_EXPECTED_NUM_PADDING              2
+#define MAX_EXPECTED_NUM_PADDING                 2
 
 /**
  * @brief Smallest amount of data that can be Base64 encoded is a byte. Encoding
  * a single byte of data results in 2 bytes of encoded data. Therefore if the
  * encoded data is smaller than 2 bytes, there is an error with the data.
  */
-#define MIN_VALID_ENCODED_DATA_SIZE           2U
+#define MIN_VALID_ENCODED_DATA_SIZE              2U
 
 /**
  * @brief The number of bits in a single octet.
  */
-#define SIZE_OF_ONE_OCTET                     8U
+#define SIZE_OF_ONE_OCTET                        8U
 
 /**
  * @brief The number of bits in two octets.
  */
-#define SIZE_OF_TWO_OCTETS                    16U
+#define SIZE_OF_TWO_OCTETS                       16U
 
 /**
  * @brief The number of padding bits that are present when there are two sextets
  * of encoded data.
  */
-#define SIZE_OF_PADDING_WITH_TWO_SEXTETS      4
+#define SIZE_OF_PADDING_WITH_TWO_SEXTETS         4
 
 /**
  * @brief The number of padding bits that are present when there are three
  * sextets of encoded data.
  */
-#define SIZE_OF_PADDING_WITH_THREE_SEXTETS    2
+#define SIZE_OF_PADDING_WITH_THREE_SEXTETS       2
 
 /**
  * @brief Inclusive upper bound for valid values that can be contained in
  * base64SymbolToIndexMap.
  */
-#define SYMBOL_TO_INDEX_MAP_VALUE_UPPER_BOUND 67U
+#define SYMBOL_TO_INDEX_MAP_VALUE_UPPER_BOUND    67U
 
 /**
  * @brief Inclusive upper bound for the range of valid Base64 index values.
  */
-#define BASE64_INDEX_VALUE_UPPER_BOUND        63U
+#define BASE64_INDEX_VALUE_UPPER_BOUND           63U
 
 /**
  * @brief         Validates the input Base64 index based on the context of what
@@ -361,37 +361,38 @@ Base64Status_t base64_Decode( uint8_t * dest,
                               const size_t encodedLen )
 {
     /**
-    * @brief This table takes is indexed by an Ascii character and returns the
-    * respective Base64 index. The Ascii character used to index into this table is
-    * assumed to represent a symbol in a string of Base64 encoded data. There are
-    * three kinds of possible ascii characters: 1) Base64 Symbols. These are the
-    * digits of a Base 64 number system. 2) Formatting characters. These are
-    * newline, whitespace, and padding. 3) Symbols that are impossible to have
-    * inside of correctly Base64 encoded data.
-    *
-    *        This table assumes that the padding symbol is the Ascii character '='
-    *
-    *        Valid Base64 symbols will have an index ranging from 0-63. The Base64
-    * digits being used are
-    * "ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnopqrstuvwxyz0123456789+/" where 'A'
-    * is the 0th index of the Base64 symbols and '/' is the 63rd index.
-    *
-    *        Outside of the numbers 0-63, there are magic numbers in this table:
-    *        - The 11th entry in this table has the number 64. This is to identify
-    * the ascii character
-    *          '\n' as a newline character.
-    *        - The 14th entry in this table has the number 64. This is to identify
-    * the ascii character
-    *          '\\r' as a newline character.
-    *        - The 33rd entry in this table has the number 65. This is to identify
-    * the ascii character ' ' as a whitespace character.
-    *        - The 62nd entry in this table has the number 66. This is to identify
-    * the ascii character
-    *          '=' as the padding character.
-    *        - All positions in the ascii table that are invalid symbols are
-    * identified with the number 67 (other than '\n','\\r',' ','=').
-    */
-    const uint8_t base64SymbolToIndexMap[] = {
+     * @brief This table takes is indexed by an Ascii character and returns the
+     * respective Base64 index. The Ascii character used to index into this table is
+     * assumed to represent a symbol in a string of Base64 encoded data. There are
+     * three kinds of possible ascii characters: 1) Base64 Symbols. These are the
+     * digits of a Base 64 number system. 2) Formatting characters. These are
+     * newline, whitespace, and padding. 3) Symbols that are impossible to have
+     * inside of correctly Base64 encoded data.
+     *
+     *        This table assumes that the padding symbol is the Ascii character '='
+     *
+     *        Valid Base64 symbols will have an index ranging from 0-63. The Base64
+     * digits being used are
+     * "ABCDEFGHIJKLMNOPQRSTUVWXYabcdefghijklmnopqrstuvwxyz0123456789+/" where 'A'
+     * is the 0th index of the Base64 symbols and '/' is the 63rd index.
+     *
+     *        Outside of the numbers 0-63, there are magic numbers in this table:
+     *        - The 11th entry in this table has the number 64. This is to identify
+     * the ascii character
+     *          '\n' as a newline character.
+     *        - The 14th entry in this table has the number 64. This is to identify
+     * the ascii character
+     *          '\\r' as a newline character.
+     *        - The 33rd entry in this table has the number 65. This is to identify
+     * the ascii character ' ' as a whitespace character.
+     *        - The 62nd entry in this table has the number 66. This is to identify
+     * the ascii character
+     *          '=' as the padding character.
+     *        - All positions in the ascii table that are invalid symbols are
+     * identified with the number 67 (other than '\n','\\r',' ','=').
+     */
+    const uint8_t base64SymbolToIndexMap[] =
+    {
         67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 64, 67, 67, 64, 67, 67, 67, 67, 67,
         67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 65, 67, 67, 67, 67, 67,
         67, 67, 67, 67, 67, 62, 67, 67, 67, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60,
@@ -431,6 +432,7 @@ Base64Status_t base64_Decode( uint8_t * dest,
            ( pCurrBase64Symbol < ( encodedData + encodedLen ) ) )
     {
         uint8_t base64Index = 0;
+
         /* Read in the next Ascii character that represents the current Base64
          * symbol. */
         uint8_t base64AsciiSymbol = *pCurrBase64Symbol++;

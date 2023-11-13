@@ -19,7 +19,7 @@
 /**
  * @brief Number of keys in cbor get stream request message.
  */
-#define CBOR_GETSTREAMREQUEST_ITEM_COUNT 6
+#define CBOR_GETSTREAMREQUEST_ITEM_COUNT    6
 
 /* ========================================================================== */
 
@@ -266,7 +266,7 @@ bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder, (int64_t) fileId );
+        cborResult = cbor_encode_int( &cborMapEncoder, ( int64_t ) fileId );
     }
 
     /* Encode the block size key and value. */
@@ -278,7 +278,7 @@ bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder, (int64_t) blockSize );
+        cborResult = cbor_encode_int( &cborMapEncoder, ( int64_t ) blockSize );
     }
 
     /* Encode the block offset key and value. */
@@ -290,7 +290,7 @@ bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder, (int64_t) blockOffset );
+        cborResult = cbor_encode_int( &cborMapEncoder, ( int64_t ) blockOffset );
     }
 
     /* Encode the block bitmap key and value. */
@@ -316,7 +316,7 @@ bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_encode_int( &cborMapEncoder, (int64_t) numOfBlocksRequested );
+        cborResult = cbor_encode_int( &cborMapEncoder, ( int64_t ) numOfBlocksRequested );
     }
 
     /* Close the encoder. */

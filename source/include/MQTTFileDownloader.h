@@ -24,47 +24,47 @@
  * These first few are topic extensions to the dynamic base topic that includes
  * the Thing name.
  */
-#define MQTT_API_THINGS     "$aws/things/" /*!< Topic prefix for thing APIs. */
-#define MQTT_API_STREAMS    "/streams/"    /*!< Stream API identifier. */
-#define MQTT_API_DATA_CBOR  "/data/cbor"   /*!< Stream API suffix. */
-#define MQTT_API_GET_CBOR   "/get/cbor"    /*!< Stream API suffix. */
-#define MQTT_API_DATA_JSON  "/data/json"   /*!< JSON DATA Stream API suffix. */
-#define MQTT_API_GET_JSON   "/get/json"    /*!< JSON GET Stream API suffix. */
+#define MQTT_API_THINGS                         "$aws/things/" /*!< Topic prefix for thing APIs. */
+#define MQTT_API_STREAMS                        "/streams/"    /*!< Stream API identifier. */
+#define MQTT_API_DATA_CBOR                      "/data/cbor"   /*!< Stream API suffix. */
+#define MQTT_API_GET_CBOR                       "/get/cbor"    /*!< Stream API suffix. */
+#define MQTT_API_DATA_JSON                      "/data/json"   /*!< JSON DATA Stream API suffix. */
+#define MQTT_API_GET_JSON                       "/get/json"    /*!< JSON GET Stream API suffix. */
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Maximum stream name length.
-*/
-#define STREAM_NAME_MAX_LEN 44U
+ */
+#define STREAM_NAME_MAX_LEN                     44U
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Length of NULL character. Used in calculating lengths of MQTT topics.
-*/
-#define NULL_CHAR_LEN       1U
+ */
+#define NULL_CHAR_LEN                           1U
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Maximum thing name length.
-*/
-#define MAX_THINGNAME_LEN   128U
+ */
+#define MAX_THINGNAME_LEN                       128U
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Stream Request Buffer Size
-*/
-#define GET_STREAM_REQUEST_BUFFER_SIZE 256U
+ */
+#define GET_STREAM_REQUEST_BUFFER_SIZE          256U
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * @brief Configure the Maximum size of the data payload.
  */
-#define mqttFileDownloader_CONFIG_BLOCK_SIZE 256U
+#define mqttFileDownloader_CONFIG_BLOCK_SIZE    256U
 
 /**
  * @brief Macro to calculate string length.
  */
-#define CONST_STRLEN( s )   ( ( ( uint32_t ) sizeof( s ) ) - 1UL )
+#define CONST_STRLEN( s )    ( ( ( uint32_t ) sizeof( s ) ) - 1UL )
 
 /**
  * @brief Length of common parts MQTT topic.
@@ -91,14 +91,14 @@
  */
 typedef enum
 {
-    MQTTFileDownloaderFailure,                  /**< Failure. */
-    MQTTFileDownloaderSuccess,                  /**< Success. */
-    MQTTFileDownloaderBadParameter,             /**< Bad Parameter. */
-    MQTTFileDownloaderNotInitialized,           /**< Downloader not initalized. */
-    MQTTFileDownloaderInitFailed,               /**< Downloader init failed. */
-    MQTTFileDownloaderSubscribeFailed,          /**< MQTT subscribe failed. */
-    MQTTFileDownloaderPublishFailed,            /**< MQTT publish failed. */
-    MQTTFileDownloaderDataDecodingFailed        /**< MQTT data decoding failed. */
+    MQTTFileDownloaderFailure,           /**< Failure. */
+    MQTTFileDownloaderSuccess,           /**< Success. */
+    MQTTFileDownloaderBadParameter,      /**< Bad Parameter. */
+    MQTTFileDownloaderNotInitialized,    /**< Downloader not initalized. */
+    MQTTFileDownloaderInitFailed,        /**< Downloader init failed. */
+    MQTTFileDownloaderSubscribeFailed,   /**< MQTT subscribe failed. */
+    MQTTFileDownloaderPublishFailed,     /**< MQTT publish failed. */
+    MQTTFileDownloaderDataDecodingFailed /**< MQTT data decoding failed. */
 } MQTTFileDownloaderStatus_t;
 
 /**
@@ -107,8 +107,8 @@ typedef enum
  */
 typedef enum
 {
-    DATA_TYPE_JSON,     /**< JSON data type. */
-    DATA_TYPE_CBOR      /**< CBOR data type. */
+    DATA_TYPE_JSON, /**< JSON data type. */
+    DATA_TYPE_CBOR  /**< CBOR data type. */
 } DataType_t;
 
 /**
@@ -117,11 +117,11 @@ typedef enum
  */
 typedef struct
 {
-    char topicStreamData[ TOPIC_STREAM_DATA_BUFFER_SIZE ];      /**< Stream data MQTT topic. */
-    size_t topicStreamDataLength;                               /**< Stream data MQTT topic length. */
-    char topicGetStream[ TOPIC_GET_STREAM_BUFFER_SIZE ];        /**< Get Stream MQTT topic. */
-    size_t topicGetStreamLength;                                /**< Get Stream MQTT topic length. */
-    uint8_t dataType;                                           /**< Encoding type to be used to download the file. */
+    char topicStreamData[ TOPIC_STREAM_DATA_BUFFER_SIZE ]; /**< Stream data MQTT topic. */
+    size_t topicStreamDataLength;                          /**< Stream data MQTT topic length. */
+    char topicGetStream[ TOPIC_GET_STREAM_BUFFER_SIZE ];   /**< Get Stream MQTT topic. */
+    size_t topicGetStreamLength;                           /**< Get Stream MQTT topic length. */
+    uint8_t dataType;                                      /**< Encoding type to be used to download the file. */
 } MqttFileDownloaderContext_t;
 
 /**
@@ -138,11 +138,11 @@ typedef struct
  */
 /* @[declare_mqttDownloader_init] */
 MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * context,
-                             const char * streamName,
-                             size_t streamNameLength,
-                             const char * thingName,
-                             size_t thingNameLength,
-                             DataType_t dataType );
+                                                const char * streamName,
+                                                size_t streamNameLength,
+                                                const char * thingName,
+                                                size_t thingNameLength,
+                                                DataType_t dataType );
 /* @[declare_mqttDownloader_init] */
 
 /**
@@ -154,18 +154,18 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
  * @param[in] blockOffset Block Offset.
  * @param[in] numberOfBlocksRequested Number of Blocks requested per request.
  * @param[out] getStreamRequest Buffer to store the get stream request.
+ * @param[in] getStreamRequestLength Length of getStreamRequest buffer.
  *
  * @return size_t returns Length of the get stream request.
  */
 /* @[declare_mqttDownloader_createGetDataBlockRequest] */
-size_t mqttDownloader_createGetDataBlockRequest(
-    DataType_t dataType,
-    uint16_t fileId,
-    uint32_t blockSize,
-    uint16_t blockOffset,
-    uint32_t numberOfBlocksRequested,
-    char * getStreamRequest,
-    size_t getStreamRequestLength);
+size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
+                                                 uint16_t fileId,
+                                                 uint32_t blockSize,
+                                                 uint16_t blockOffset,
+                                                 uint32_t numberOfBlocksRequested,
+                                                 char * getStreamRequest,
+                                                 size_t getStreamRequestLength );
 /* @[declare_mqttDownloader_createGetDataBlockRequest] */
 
 /**
@@ -195,11 +195,10 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
  * @return returns True if the message is handled else False.
  */
 /* @[declare_mqttDownloader_processReceivedDataBlock] */
-MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock(
-    const MqttFileDownloaderContext_t * context,
-    uint8_t * message,
-    size_t messageLength,
-    uint8_t * data,
-    size_t * dataLength );
+MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFileDownloaderContext_t * context,
+                                                                    uint8_t * message,
+                                                                    size_t messageLength,
+                                                                    uint8_t * data,
+                                                                    size_t * dataLength );
 /* @[declare_mqttDownloader_processReceivedDataBlock] */
 #endif /* #ifndef MQTT_FILE_DOWNLOADER_H */

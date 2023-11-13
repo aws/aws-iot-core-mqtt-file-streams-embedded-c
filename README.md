@@ -1,6 +1,6 @@
 ## MQTT File Streams library
 
-In AWS IoT, a **stream** is a publicly addressable resource that is an abstraction for a list of files that can be transferred to an IoT device. Using MQTT file streams library, files from a stream can be transfer to an IoT device. The file is transfered using MQTT protocol. It supports both JSON and CBOR format to send requests and receive data.
+In AWS IoT, a **stream** is a publicly addressable resource that is an abstraction for a list of files that can be transferred to an IoT device. Using MQTT file streams library, files from a stream can be transfer to an IoT device. The file is transferred using MQTT protocol. It supports both JSON and CBOR format to send requests and receive data.
 
 More information about streams and MQTT based file delivery can be found [here](https://docs.aws.amazon.com/iot/latest/developerguide/mqtt-based-file-delivery.html)
 
@@ -47,7 +47,7 @@ The [mqttFileDownloaderFilePaths.cmake](mqttFileDownloaderFilePaths.cmake) file 
 To learn more about CBMC and proofs specifically, review the training material
 [here](https://model-checking.github.io/cbmc-training).
 
-The `test/cbmc/proofs` directory contains CBMC proofs.
+The `test/cbmc` directory contains CBMC proofs.
 
 In order to run these proofs you will need to install CBMC and other tools by
 following the instructions
