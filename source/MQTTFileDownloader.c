@@ -404,7 +404,7 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFi
 {
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderFailure;
 
-    if( ( message != NULL ) && ( messageLength != 0 ) && ( data != NULL ) )
+    if( ( message != NULL ) && ( messageLength != 0 ) && ( data != NULL ) && (dataLength != NULL) )
     {
         ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
 

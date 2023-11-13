@@ -194,6 +194,31 @@ void test_createGetDataBlockRequest_succeedsForCBORDataType( void )
     TEST_ASSERT_EQUAL_MEMORY( encodedMessage, "expected-message", strlen( encodedMessage ) );
 }
 
+void test_createGetDataBlockRequest_FailsWhenGetStreamRequestLengthTooSmall( void )
+{
+    char getStreamRequest[ GET_STREAM_REQUEST_BUFFER_SIZE ];
+    size_t getStreamRequestLength = 0;
+
+    char * encodedMessage = "expected-message";
+    size_t expectedCborSize = 9999U;
+
+    requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_JSON, 4U, 3U, 2U, 1U, getStreamRequest, getStreamRequestLength);
+    TEST_ASSERT_EQUAL(0, requestLength);
+
+}
+
+void test_createGetDataBlockRequest_FailsWhenGetStreamRequestBufferIsNull( void )
+{
+    size_t getStreamRequestLength = GET_STREAM_REQUEST_BUFFER_SIZE;
+
+    char * encodedMessage = "expected-message";
+    size_t expectedCborSize = 9999U;
+
+    requestLength = mqttDownloader_createGetDataBlockRequest(DATA_TYPE_JSON, 4U, 3U, 2U, 1U, NULL, getStreamRequestLength);
+    TEST_ASSERT_EQUAL(0, requestLength);
+
+}
+
 void test_isDataBlockReceived_returnTrue( void )
 {
     MqttFileDownloaderContext_t context = { 0 };
@@ -375,5 +400,18 @@ void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
     size_t dataLength = 0;
 
     uintResult = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ) , NULL, &dataLength );
+    TEST_ASSERT_EQUAL(MQTTFileDownloaderFailure, uintResult);
+}
+
+void test_processReceivedDataBlock_returnsFailureWhenDataLengthIsNull( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t * dataLength = NULL;
+
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ) , decodedData, dataLength );
     TEST_ASSERT_EQUAL(MQTTFileDownloaderFailure, uintResult);
 }
