@@ -1,7 +1,7 @@
 # Static code analysis for AWS-IoT-Core-MQTT-File-Streams-Embedded-C library
-This directory is made for the purpose of statically testing the MISRA C:2012 compliance of Jobs-for-AWS-IoT-embedded-sdk using
+This directory is made for the purpose of statically testing the MISRA C:2012 compliance of AWS-IoT-Core-MQTT-File-Streams-Embedded-C library using
 [Synopsys Coverity](https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html) static analysis tool.
-To that end, this directory provides a [configuration file](https://github.com/aws/Jobs-for-AWS-IoT-embedded-sdk/blob/main/tools/coverity/misra.config) to use when
+To that end, this directory provides a [configuration file](https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c/blob/main/tools/coverity/misra.config) to use when
 building a binary for the tool to analyze.
 
 > **Note**
