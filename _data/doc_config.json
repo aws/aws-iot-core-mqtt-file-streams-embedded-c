@@ -1,0 +1,9 @@
+{
+  "name": "aws-iot-core-mqtt-file-streams-embedded-c",
+  "releases": [
+    "v1.0.0"
+  ],
+  "branches": [
+    "main"
+  ]
+}
