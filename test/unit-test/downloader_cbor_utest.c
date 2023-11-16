@@ -23,9 +23,9 @@
 #define CBOR_GETSTREAMREQUEST_ITEM_COUNT    6
 
 /* ============================   TEST GLOBALS ============================= */
-const uint8_t * decodeMessageBuffer = "decodeMessageBuffer";
-uint8_t * encodeMessageBuffer = "encodeMessageBuffer";
-const uint8_t * blockBitmap = "blockBitmap";
+const uint8_t * decodeMessageBuffer = (const uint8_t * ) "decodeMessageBuffer";
+uint8_t * encodeMessageBuffer = ( uint8_t * ) "encodeMessageBuffer";
+const uint8_t * blockBitmap = (const uint8_t * ) "blockBitmap";
 const char * clientToken = "clientToken";
 int32_t blockId = 1;
 int32_t blockSize = 2;
@@ -102,7 +102,7 @@ void cborFindsBlockIdKey( void )
 
 void cborBlockIdKeyCorrectType( void )
 {
-    cbor_value_get_type_ExpectAndReturn( &cborValue, CborNoError );
+    cbor_value_get_type_ExpectAndReturn( &cborValue, (CborType) CborNoError );
     cbor_value_get_int_ExpectAndReturn( &cborValue, &blockId, CborNoError );
 }
 
@@ -115,7 +115,7 @@ void cborFindsBlockSizeKey( void )
 
 void cborBlockSizeKeyCorrectType( void )
 {
-    cbor_value_get_type_ExpectAndReturn( &cborValue, CborNoError );
+    cbor_value_get_type_ExpectAndReturn( &cborValue, (CborType) CborNoError );
     cbor_value_get_int_ExpectAndReturn( &cborValue, &blockSize, CborNoError );
 }
 
@@ -187,7 +187,6 @@ void cborEncodesNumberOfBlocks( void )
 
 void test_Decode_succeeds( void )
 {
-    uint8_t payload;
     uint8_t * payloadPtr;
 
     payloadSizeReceived = payloadSize - 1;
@@ -325,7 +324,7 @@ void test_Decode_returnsFalse_cannotGetBlockIdValue( void )
     cborFileIdKeyCorrectType();
     cborFindsBlockIdKey();
     cbor_value_get_type_ExpectAndReturn( &cborValue, CborNoError );
-    cbor_value_get_int_ExpectAndReturn( &cborValue, &blockId, CborUnknownError );
+    cbor_value_get_int_ExpectAndReturn( &cborValue, &blockId, (CborType) CborUnknownError );
 
     result = CBOR_Decode_GetStreamResponseMessage( decodeMessageBuffer, 1234U, &fileId, &blockId, &blockSize, payload, &payloadSize );
     TEST_ASSERT_FALSE( result );
@@ -354,7 +353,7 @@ void test_Decode_returnsFalse_blockSizeWrongTypeInMap( void )
     cborFindsBlockIdKey();
     cborBlockIdKeyCorrectType();
     cborFindsBlockSizeKey();
-    cbor_value_get_type_ExpectAndReturn( &cborValue, CborUnknownError );
+    cbor_value_get_type_ExpectAndReturn( &cborValue, (CborType) CborUnknownError );
 
     result = CBOR_Decode_GetStreamResponseMessage( decodeMessageBuffer, 1234U, &fileId, &blockId, &blockSize, payload, &payloadSize );
     TEST_ASSERT_FALSE( result );
@@ -369,7 +368,7 @@ void test_Decode_returnsFalse_cannotGetBlockSizeValue( void )
     cborFindsBlockIdKey();
     cborBlockIdKeyCorrectType();
     cborFindsBlockSizeKey();
-    cbor_value_get_type_ExpectAndReturn( &cborValue, CborNoError );
+    cbor_value_get_type_ExpectAndReturn( &cborValue, (CborType) CborNoError );
     cbor_value_get_int_ExpectAndReturn( &cborValue, &blockSize, CborUnknownError );
 
     result = CBOR_Decode_GetStreamResponseMessage( decodeMessageBuffer, 1234U, &fileId, &blockId, &blockSize, payload, &payloadSize );
@@ -404,7 +403,7 @@ void test_Decode_returnsFalse_blockPayloadWrongTypeInMap( void )
     cborBlockSizeKeyCorrectType();
     cborFindsPayloadKeyInMap();
 
-    cbor_value_get_type_ExpectAndReturn( &cborValue, CborUnknownError );
+    cbor_value_get_type_ExpectAndReturn( &cborValue, (CborType) CborUnknownError );
 
     result = CBOR_Decode_GetStreamResponseMessage( decodeMessageBuffer, 1234U, &fileId, &blockId, &blockSize, payload, &payloadSize );
     TEST_ASSERT_FALSE( result );
@@ -451,7 +450,6 @@ void test_Decode_returnsFalse_blockPayloadLargerThanBuffer( void )
 
 void test_Decode_returnsFalse_failsCopyingPayloadByteString( void )
 {
-    uint8_t payload;
     uint8_t * payloadPtr;
 
     payloadSizeReceived = payloadSize - 1;
