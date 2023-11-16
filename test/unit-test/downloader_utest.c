@@ -301,7 +301,7 @@ void test_processReceivedDataBlock_processesJSONBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, (uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, &dataLength );
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, &dataLength );
 
     TEST_ASSERT_TRUE( result );
     TEST_ASSERT_EQUAL( 4, dataLength );
@@ -419,7 +419,6 @@ void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
 
     context.dataType = DATA_TYPE_JSON;
 
-    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
     uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), NULL, &dataLength );
