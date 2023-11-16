@@ -20,7 +20,7 @@
 
 /* ============================   TEST GLOBALS ============================= */
 const size_t destLength = mqttFileDownloader_CONFIG_BLOCK_SIZE;
-const uint8_t * encodedTest = "dGVzdA=="; /* The string 'test' base64 encoded */
+const uint8_t * encodedTest = ( const uint8_t * ) "dGVzdA=="; /* The string 'test' base64 encoded */
 size_t encodedTestLen = 8U;
 size_t decodedTestLen = 4U;
 
@@ -73,7 +73,7 @@ void test_base64Decode_decodesDataSuccessfully_2Chars( void )
     /* Setting to an error before the test to make sure it's the function which succeeds */
     decodeStatus = Base64NullPointerInput;
 
-    decodeStatus = base64_Decode( destBuffer, destLength, &decodeLen, "dHk=", 4U );
+    decodeStatus = base64_Decode( destBuffer, destLength, &decodeLen, ( const uint8_t * ) "dHk=", 4U );
 
     TEST_ASSERT_EQUAL( Base64Success, decodeStatus );
     TEST_ASSERT_EQUAL( 2, decodeLen );
@@ -84,7 +84,7 @@ void test_base64Decode_decodesDataSuccessfully_3Chars( void )
     /* Setting to an error before the test to make sure it's the function which succeeds */
     decodeStatus = Base64NullPointerInput;
 
-    decodeStatus = base64_Decode( destBuffer, destLength, &decodeLen, "dHJ5", 3U );
+    decodeStatus = base64_Decode( destBuffer, destLength, &decodeLen, ( const uint8_t * ) "dHJ5", 3U );
 
     TEST_ASSERT_EQUAL( Base64NonZeroPadding, decodeStatus );
 }

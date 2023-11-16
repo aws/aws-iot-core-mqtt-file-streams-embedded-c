@@ -57,8 +57,7 @@ int suiteTearDown( int numFailures )
 /* =============================   CALLBACKS   ============================= */
 
 bool mqtt_subscribe_stream_json_true( char * topic,
-                                      size_t topicLength,
-                                      int NumCalls )
+                                      size_t topicLength )
 {
     TEST_ASSERT_EQUAL_MEMORY( "$aws/things/thingname/streams/stream-name/data/json", topic, strlen( "$aws/things/thingname/streams/stream-name/data/json" ) );
     TEST_ASSERT_EQUAL_INT( strlen( "$aws/things/thingname/streams/stream-name/data/json" ), topicLength );
@@ -66,8 +65,7 @@ bool mqtt_subscribe_stream_json_true( char * topic,
 }
 
 bool mqtt_subscribe_stream_json_false( char * topic,
-                                       size_t topicLength,
-                                       int NumCalls )
+                                       size_t topicLength )
 {
     TEST_ASSERT_EQUAL_MEMORY( "$aws/things/thingname/streams/stream-name/data/json", topic, strlen( "$aws/things/thingname/streams/stream-name/data/json" ) );
     TEST_ASSERT_EQUAL_INT( strlen( "$aws/things/thingname/streams/stream-name/data/json" ), topicLength );
@@ -76,8 +74,7 @@ bool mqtt_subscribe_stream_json_false( char * topic,
 
 
 bool mqtt_subscribe_stream_cbor_true( char * topic,
-                                      size_t topicLength,
-                                      int NumCalls )
+                                      size_t topicLength )
 {
     TEST_ASSERT_EQUAL_MEMORY( "$aws/things/thingname/streams/stream-name/data/cbor", topic, strlen( "$aws/things/thingname/streams/stream-name/data/cbor" ) );
     TEST_ASSERT_EQUAL_INT( strlen( "$aws/things/thingname/streams/stream-name/data/cbor" ), topicLength );
@@ -85,8 +82,7 @@ bool mqtt_subscribe_stream_cbor_true( char * topic,
 }
 
 bool mqtt_subscribe_stream_cbor_false( char * topic,
-                                       size_t topicLength,
-                                       int NumCalls )
+                                       size_t topicLength )
 {
     TEST_ASSERT_EQUAL_MEMORY( "$aws/things/thingname/streams/stream-name/data/cbor", topic, strlen( "$aws/things/thingname/streams/stream-name/data/cbor" ) );
     TEST_ASSERT_EQUAL_INT( strlen( "$aws/things/thingname/streams/stream-name/data/cbor" ), topicLength );
@@ -96,8 +92,7 @@ bool mqtt_subscribe_stream_cbor_false( char * topic,
 bool mqtt_publish_request_json_true( char * topic,
                                      size_t topicLength,
                                      uint8_t * message,
-                                     size_t messageLength,
-                                     int NumCalls )
+                                     size_t messageLength )
 {
     TEST_ASSERT_EQUAL_MEMORY( getStreamTopic, topic, getStreamTopicLength );
     TEST_ASSERT_EQUAL_INT( getStreamTopicLength, topicLength );
@@ -109,8 +104,7 @@ bool mqtt_publish_request_json_true( char * topic,
 bool mqtt_publish_request_json_false( char * topic,
                                       size_t topicLength,
                                       uint8_t * message,
-                                      size_t messageLength,
-                                      int NumCalls )
+                                      size_t messageLength )
 {
     TEST_ASSERT_EQUAL_MEMORY( getStreamTopic, topic, getStreamTopicLength );
     TEST_ASSERT_EQUAL_INT( getStreamTopicLength, topicLength );
@@ -208,7 +202,7 @@ void test_createGetDataBlockRequest_succeedsForCBORDataType( void )
     char * encodedMessage = "expected-message";
     size_t expectedCborSize = 9999U;
 
-    CBOR_Encode_GetStreamRequestMessage_ExpectAndReturn( getStreamRequest,
+    CBOR_Encode_GetStreamRequestMessage_ExpectAndReturn( ( uint8_t * ) &getStreamRequest,
                                                          GET_STREAM_REQUEST_BUFFER_SIZE,
                                                          NULL,
                                                          "rdy",
@@ -223,7 +217,7 @@ void test_createGetDataBlockRequest_succeedsForCBORDataType( void )
     CBOR_Encode_GetStreamRequestMessage_IgnoreArg_encodedMessageSize();
     CBOR_Encode_GetStreamRequestMessage_IgnoreArg_messageBuffer();
     CBOR_Encode_GetStreamRequestMessage_ReturnThruPtr_encodedMessageSize( &expectedCborSize );
-    CBOR_Encode_GetStreamRequestMessage_ReturnThruPtr_messageBuffer( encodedMessage );
+    CBOR_Encode_GetStreamRequestMessage_ReturnThruPtr_messageBuffer( ( uint8_t * ) encodedMessage );
 
     requestLength = mqttDownloader_createGetDataBlockRequest( DATA_TYPE_CBOR, 4U, 3U, 2U, 1U, getStreamRequest, getStreamRequestLength );
     TEST_ASSERT_EQUAL( expectedCborSize, requestLength );
@@ -235,9 +229,6 @@ void test_createGetDataBlockRequest_FailsWhenGetStreamRequestLengthTooSmall( voi
     char getStreamRequest[ GET_STREAM_REQUEST_BUFFER_SIZE ];
     size_t getStreamRequestLength = 0;
 
-    char * encodedMessage = "expected-message";
-    size_t expectedCborSize = 9999U;
-
     requestLength = mqttDownloader_createGetDataBlockRequest( DATA_TYPE_JSON, 4U, 3U, 2U, 1U, getStreamRequest, getStreamRequestLength );
     TEST_ASSERT_EQUAL( 0, requestLength );
 }
@@ -245,9 +236,6 @@ void test_createGetDataBlockRequest_FailsWhenGetStreamRequestLengthTooSmall( voi
 void test_createGetDataBlockRequest_FailsWhenGetStreamRequestBufferIsNull( void )
 {
     size_t getStreamRequestLength = GET_STREAM_REQUEST_BUFFER_SIZE;
-
-    char * encodedMessage = "expected-message";
-    size_t expectedCborSize = 9999U;
 
     requestLength = mqttDownloader_createGetDataBlockRequest( DATA_TYPE_JSON, 4U, 3U, 2U, 1U, NULL, getStreamRequestLength );
     TEST_ASSERT_EQUAL( 0, requestLength );
@@ -313,7 +301,7 @@ void test_processReceivedDataBlock_processesJSONBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, &dataLength );
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, &dataLength );
 
     TEST_ASSERT_TRUE( result );
     TEST_ASSERT_EQUAL( 4, dataLength );
@@ -328,7 +316,7 @@ void test_processReceivedDataBlock_invalidJSONBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, "{\"wrongKey\": \"dGVzdA==\"}", strlen( "{\"wrongKey\": \"dGVzdA==\"}" ), decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"wrongKey\": \"dGVzdA==\"}", strlen( "{\"wrongKey\": \"dGVzdA==\"}" ), decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
     TEST_ASSERT_EQUAL( 0, dataLength );
@@ -343,7 +331,7 @@ void test_processReceivedDataBlock_invalidEncodingJSONBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"notEncoded\"}", strlen( "{\"p\": \"notEncoded\"}" ), decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"notEncoded\"}", strlen( "{\"p\": \"notEncoded\"}" ), decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
     TEST_ASSERT_EQUAL( 0, dataLength );
@@ -360,7 +348,7 @@ void test_processReceivedDataBlock_processesCBORBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    CBOR_Decode_GetStreamResponseMessage_ExpectAndReturn( validCBORMsg, strlen( validCBORMsg ), NULL, NULL, NULL, NULL, NULL, true );
+    CBOR_Decode_GetStreamResponseMessage_ExpectAndReturn( ( const uint8_t * ) validCBORMsg, strlen( validCBORMsg ), NULL, NULL, NULL, NULL, NULL, true );
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_fileId();
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_blockSize();
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_blockId();
@@ -368,7 +356,7 @@ void test_processReceivedDataBlock_processesCBORBlock( void )
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_payloadSize();
     CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_payloadSize( &expectedProcessedDataLength );
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, validCBORMsg, strlen( validCBORMsg ), decodedData, &dataLength );
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) validCBORMsg, strlen( validCBORMsg ), decodedData, &dataLength );
 
     TEST_ASSERT_TRUE( result );
     TEST_ASSERT_EQUAL( expectedProcessedDataLength, dataLength );
@@ -385,7 +373,7 @@ void test_processReceivedDataBlock_invalidCBORBlock( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    CBOR_Decode_GetStreamResponseMessage_ExpectAndReturn( invalidCBORMsg, strlen( invalidCBORMsg ), NULL, NULL, NULL, NULL, NULL, false );
+    CBOR_Decode_GetStreamResponseMessage_ExpectAndReturn( ( const uint8_t * ) invalidCBORMsg, strlen( invalidCBORMsg ), NULL, NULL, NULL, NULL, NULL, false );
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_fileId();
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_blockSize();
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_blockId();
@@ -393,7 +381,7 @@ void test_processReceivedDataBlock_invalidCBORBlock( void )
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_payloadSize();
     CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_payloadSize( &notExpectedProcessedDataLength );
 
-    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, invalidCBORMsg, strlen( invalidCBORMsg ), decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) invalidCBORMsg, strlen( invalidCBORMsg ), decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
     TEST_ASSERT_EQUAL( 0, dataLength );
@@ -421,7 +409,7 @@ void test_processReceivedDataBlock_returnsFailureWhenMessageLengthZero( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    uintResult = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", 0U, decodedData, &dataLength );
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", 0U, decodedData, &dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
 }
 
@@ -431,10 +419,9 @@ void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
 
     context.dataType = DATA_TYPE_JSON;
 
-    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
 
-    uintResult = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), NULL, &dataLength );
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), NULL, &dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
 }
 
@@ -447,6 +434,6 @@ void test_processReceivedDataBlock_returnsFailureWhenDataLengthIsNull( void )
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t * dataLength = NULL;
 
-    uintResult = mqttDownloader_processReceivedDataBlock( &context, "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, dataLength );
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
 }
