@@ -323,8 +323,8 @@ void test_Decode_returnsFalse_cannotGetBlockIdValue( void )
     cborFindsFileIdKey();
     cborFileIdKeyCorrectType();
     cborFindsBlockIdKey();
-    cbor_value_get_type_ExpectAndReturn( &cborValue, CborNoError );
-    cbor_value_get_int_ExpectAndReturn( &cborValue, &blockId, (CborType) CborUnknownError );
+    cbor_value_get_type_ExpectAndReturn( &cborValue, (CborType) CborNoError );
+    cbor_value_get_int_ExpectAndReturn( &cborValue, &blockId, CborUnknownError );
 
     result = CBOR_Decode_GetStreamResponseMessage( decodeMessageBuffer, 1234U, &fileId, &blockId, &blockSize, payload, &payloadSize );
     TEST_ASSERT_FALSE( result );
