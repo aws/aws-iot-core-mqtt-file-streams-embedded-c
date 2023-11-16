@@ -111,6 +111,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: FreeRTOS/CI-CD-Github-Actions/link-verifier@main
+        with:
+          exclude-urls: https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c/blob/main/tools/coverity/misra.config
 
   verify-manifest:
     runs-on: ubuntu-latest
