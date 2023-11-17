@@ -185,7 +185,7 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
         context->topicGetStreamLength = 0U;
         context->dataType = ( uint8_t ) dataType;
 
-        if( context->dataType ==  ( uint8_t ) DATA_TYPE_JSON )
+        if( context->dataType == ( uint8_t ) DATA_TYPE_JSON )
         {
             streamDataApiSuffix = MQTT_API_DATA_JSON;
         }
