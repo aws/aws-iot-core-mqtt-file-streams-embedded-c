@@ -170,8 +170,8 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
     const char * getStreamApiSuffix = NULL;
     MQTTFileDownloaderStatus_t initStatus = MQTTFileDownloaderSuccess;
 
-    if( ( streamName == NULL ) || ( streamNameLength == 0 ) ||
-        ( thingName == NULL ) || ( thingNameLength == 0 ) || ( context == NULL ) )
+    if( ( streamName == NULL ) || ( streamNameLength == 0U ) ||
+        ( thingName == NULL ) || ( thingNameLength == 0U ) || ( context == NULL ) )
     {
         initStatus = MQTTFileDownloaderBadParameter;
     }
@@ -183,9 +183,9 @@ MQTTFileDownloaderStatus_t mqttDownloader_init( MqttFileDownloaderContext_t * co
         ( void ) memset( context->topicGetStream, ( int32_t ) '\0', TOPIC_GET_STREAM_BUFFER_SIZE );
         context->topicStreamDataLength = 0U;
         context->topicGetStreamLength = 0U;
-        context->dataType = dataType;
+        context->dataType = ( uint8_t ) dataType;
 
-        if( dataType == DATA_TYPE_JSON )
+        if( context->dataType == ( uint8_t ) DATA_TYPE_JSON )
         {
             streamDataApiSuffix = MQTT_API_DATA_JSON;
         }
@@ -379,7 +379,7 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
 {
     MQTTFileDownloaderStatus_t status = MQTTFileDownloaderFailure;
 
-    if( ( topic == NULL ) || ( topicLength == 0 ) )
+    if( ( topic == NULL ) || ( topicLength == 0U ) )
     {
         status = MQTTFileDownloaderBadParameter;
     }
@@ -404,11 +404,11 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFi
 {
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderFailure;
 
-    if( ( message != NULL ) && ( messageLength != 0 ) && ( data != NULL ) && ( dataLength != NULL ) )
+    if( ( message != NULL ) && ( messageLength != 0U ) && ( data != NULL ) && ( dataLength != NULL ) )
     {
         ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
 
-        if( context->dataType == DATA_TYPE_JSON )
+        if( context->dataType == ( uint8_t ) DATA_TYPE_JSON )
         {
             decodingStatus = handleJsonMessage( data,
                                                 dataLength,
