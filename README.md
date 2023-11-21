@@ -4,6 +4,10 @@ In AWS IoT, a **stream** is a publicly addressable resource that is an abstracti
 
 More information about streams and MQTT based file delivery can be found [here](https://docs.aws.amazon.com/iot/latest/developerguide/mqtt-based-file-delivery.html)
 
+### MQTT File Streams library workflow
+
+![alt text](./docs/doxygen/images/MqttStreams_flowChart.jpg)
+
 ## Building MQTT File Streams library
 
 ### Dependencies
