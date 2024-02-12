@@ -19,8 +19,8 @@
     </tr>
     <tr>
         <td>MQTTFileDownloader_base64.c</td>
-        <td><center>0.7K</center></td>
-        <td><center>0.7K</center></td>
+        <td><center>0.6K</center></td>
+        <td><center>0.6K</center></td>
     </tr>
     <tr>
         <td>core_json.c</td>
@@ -44,7 +44,7 @@
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td><b><center>10.2K</center></b></td>
-        <td><b><center>7.5K</center></b></td>
+        <td><b><center>10.1K</center></b></td>
+        <td><b><center>7.4K</center></b></td>
     </tr>
 </table>

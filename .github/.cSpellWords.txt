@@ -17,6 +17,7 @@ coverity
 ctest
 misra
 mqtt
+nondet
 sizet
 stringz
 tinycbor
