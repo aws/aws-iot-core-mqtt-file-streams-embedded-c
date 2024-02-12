@@ -60,7 +60,7 @@
  * @ingroup mqtt_file_downloader_const_types
  * @brief Configure the Maximum size of the data payload.
  */
-#define mqttFileDownloader_CONFIG_BLOCK_SIZE    512U
+#define mqttFileDownloader_CONFIG_BLOCK_SIZE    256U
 
 /**
  * @brief Macro to calculate string length.
