@@ -15,6 +15,7 @@ cborpretty
 cmock
 coverity
 ctest
+DCOV
 misra
 mqtt
 nondet
