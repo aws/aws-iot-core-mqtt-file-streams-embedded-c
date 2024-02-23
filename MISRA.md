@@ -36,7 +36,7 @@ _Ref 8.9.1_
 
 _Ref 21.6.1_
 
-- MISRA Rule 21.6 prohibts use of standard library functions as these functions
-  might have implementation defined behavior. In this case, snprintf is used to
-  populate a buffer to generate a data block request. The buffer is verified to
-  be big enough to contain the populated buffer.
+- MISRA Rule 21.6 prohibits use of standard library functions as these
+  functions might have implementation defined behavior. In this case, snprintf
+  is used to populate a buffer to generate a data block request. The buffer is
+  verified to be big enough to contain the populated buffer.
