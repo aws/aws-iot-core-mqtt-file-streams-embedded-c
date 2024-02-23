@@ -15,6 +15,12 @@ if(NOT DEFINED CMAKE_C_STANDARD_REQUIRED)
   set(CMAKE_C_STANDARD_REQUIRED ON)
 endif()
 
+# If no configuration is defined, turn everything on.
+if( NOT DEFINED COV_ANALYSIS AND NOT DEFINED UNITTEST )
+    set( COV_ANALYSIS TRUE )
+    set( UNITTEST TRUE )
+endif()
+
 # Do not allow in-source build.
 if(${PROJECT_SOURCE_DIR} STREQUAL ${PROJECT_BINARY_DIR})
   message(
@@ -30,19 +36,10 @@ set(MODULE_ROOT_DIR
     ${__MODULE_ROOT_DIR}
     CACHE INTERNAL "core-mqtt-file-downloader repository root.")
 
-include(FetchContent)
-
-# ====================================  Coverity Configuration
-# ========================================
 # Include filepaths for source and include.
 include( ${MODULE_ROOT_DIR}/mqttFileDownloaderFilePaths.cmake )
-# Target for Coverity analysis that builds the library.
-add_library( coverity_analysis ${MQTT_FILE_DOWNLOADER_SOURCES} )
-# JOBS public include path.
-target_include_directories( coverity_analysis PUBLIC ${MQTT_FILE_DOWNLOADER_INCLUDES} )
 
-# Build HTTP library target without logging
-target_compile_options(coverity_analysis PUBLIC -DNDEBUG )
+include(FetchContent)
 
 FetchContent_Declare(
   CMock
@@ -70,67 +67,79 @@ add_library(
   "${tinycbor_SOURCE_DIR}/src/cborencoder.c"
   "${tinycbor_SOURCE_DIR}/src/cborencoder_close_container_checked.c")
 target_include_directories(tinycbor PUBLIC "${tinycbor_SOURCE_DIR}/src")
-target_link_libraries(coverity_analysis PUBLIC tinycbor)
 
 # coreJSON
 include("${corejson_SOURCE_DIR}/jsonFilePaths.cmake")
 add_library(coreJSON ${JSON_SOURCES})
 target_include_directories(coreJSON PUBLIC ${JSON_INCLUDE_PUBLIC_DIRS})
-target_link_libraries(coverity_analysis PUBLIC coreJSON)
-# cmock
-add_library(
-  unity STATIC
-  "${cmock_SOURCE_DIR}/vendor/unity/src/unity.c"
-  "${cmock_SOURCE_DIR}/vendor/unity/extras/fixture/src/unity_fixture.c"
-  "${cmock_SOURCE_DIR}/vendor/unity/extras/memory/src/unity_memory.c")
-target_include_directories(
-  unity
-  PUBLIC "${cmock_SOURCE_DIR}/vendor/unity/src"
-         "${cmock_SOURCE_DIR}/vendor/unity/extras/fixture/src"
-         "${cmock_SOURCE_DIR}/vendor/unity/extras/memory/src"
-         "${cmock_SOURCE_DIR}/src")
 
-set_target_properties(
-  unity PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-                   POSITION_INDEPENDENT_CODE ON)
+# ===================== Coverity Configuration =====================
+if( COV_ANALYSIS )
+  # Target for Coverity analysis that builds the library.
+  add_library( coverity_analysis ${MQTT_FILE_DOWNLOADER_SOURCES} )
+  # JOBS public include path.
+  target_include_directories( coverity_analysis PUBLIC ${MQTT_FILE_DOWNLOADER_INCLUDES} )
 
-add_library(cmock STATIC)
-target_sources(cmock PRIVATE ${cmock_SOURCE_DIR}/src/cmock.c)
-target_include_directories(
-  cmock
-  PUBLIC "${cmock_SOURCE_DIR}/src"
-         "${cmock_SOURCE_DIR}/vendor/unity/src/"
-         "${cmock_SOURCE_DIR}/examples"
-         "${cmock_SOURCE_DIR}/vendor/unity/extras/fixture/src"
-         "${cmock_SOURCE_DIR}/vendor/unity/extras/memory/src")
-set_target_properties(
-  cmock
-  PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-             POSITION_INDEPENDENT_CODE ON
-             COMPILE_FLAGS "-Og")
+  # Build HTTP library target without logging
+  target_compile_options(coverity_analysis PUBLIC -DNDEBUG )
 
+  target_link_libraries(coverity_analysis PUBLIC tinycbor)
 
+  target_link_libraries(coverity_analysis PUBLIC coreJSON)
+endif()
 
-# ====================================  Test Configuration
-# ========================================
+# ===================== Test Configuration =====================
+if( UNITTEST )
+  # cmock
+  add_library(
+    unity STATIC
+    "${cmock_SOURCE_DIR}/vendor/unity/src/unity.c"
+    "${cmock_SOURCE_DIR}/vendor/unity/extras/fixture/src/unity_fixture.c"
+    "${cmock_SOURCE_DIR}/vendor/unity/extras/memory/src/unity_memory.c")
+  target_include_directories(
+    unity
+    PUBLIC "${cmock_SOURCE_DIR}/vendor/unity/src"
+          "${cmock_SOURCE_DIR}/vendor/unity/extras/fixture/src"
+          "${cmock_SOURCE_DIR}/vendor/unity/extras/memory/src"
+          "${cmock_SOURCE_DIR}/src")
 
-# Use CTest utility for managing test runs. This has to be added BEFORE defining
-# test targets with add_test()
-enable_testing()
+  set_target_properties(
+    unity PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+                    POSITION_INDEPENDENT_CODE ON)
 
-# Add function to enable CMock based tests and coverage.
-include(${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake)
+  add_library(cmock STATIC)
+  target_sources(cmock PRIVATE ${cmock_SOURCE_DIR}/src/cmock.c)
+  target_include_directories(
+    cmock
+    PUBLIC "${cmock_SOURCE_DIR}/src"
+          "${cmock_SOURCE_DIR}/vendor/unity/src/"
+          "${cmock_SOURCE_DIR}/examples"
+          "${cmock_SOURCE_DIR}/vendor/unity/extras/fixture/src"
+          "${cmock_SOURCE_DIR}/vendor/unity/extras/memory/src")
+  set_target_properties(
+    cmock
+    PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+              POSITION_INDEPENDENT_CODE ON
+              COMPILE_FLAGS "-Og")
 
-# Include build configuration for unit tests.
-add_subdirectory(unit-test)
+  # Use CTest utility for managing test runs. This has to be added BEFORE defining
+  # test targets with add_test()
+  enable_testing()
 
-# ==================================== Coverage Analysis configuration
-# ========================================
+  # Add function to enable CMock based tests and coverage.
+  include(${MODULE_ROOT_DIR}/tools/cmock/create_test.cmake)
 
-# Add a target for running coverage on tests.
-add_custom_target(
-  coverage
-  COMMAND ${CMAKE_COMMAND} -DCMOCK_DIR=${cmock_SOURCE_DIR} -P
-          ${MODULE_ROOT_DIR}/tools/cmock/coverage.cmake
-  DEPENDS cmock unity tinycbor mqtt_file_downloader_utest mqtt_file_downloader_base64_utest mqtt_file_downloader_cbor_utest
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  # Include build configuration for unit tests.
+  add_subdirectory(unit-test)
+
+  # ==================================== Coverage Analysis configuration
+  # ========================================
+
+  # Add a target for running coverage on tests.
+  add_custom_target(
+    coverage
+    COMMAND ${CMAKE_COMMAND} -DCMOCK_DIR=${cmock_SOURCE_DIR} -P
+            ${MODULE_ROOT_DIR}/tools/cmock/coverage.cmake
+    DEPENDS cmock unity tinycbor mqtt_file_downloader_utest mqtt_file_downloader_base64_utest mqtt_file_downloader_cbor_utest
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+endif()

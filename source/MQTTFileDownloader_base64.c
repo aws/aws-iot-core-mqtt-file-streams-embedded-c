@@ -134,6 +134,9 @@
  *        - All positions in the ascii table that are invalid symbols are
  * identified with the number 67 (other than '\n','\\r',' ','=').
  */
+/* MISRA Ref 8.9.1 [Block scope symbol] */
+/* More details at: https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c//blob/main/MISRA.md#rule-89 */
+/* coverity[misra_c_2012_rule_8_9_violation] */
 static const uint8_t base64SymbolToIndexMap[] =
 {
     67, 67, 67, 67, 67, 67, 67, 67, 67, 67, 64, 67, 67, 64, 67, 67, 67, 67, 67,
@@ -432,7 +435,7 @@ Base64Status_t base64_Decode( uint8_t * dest,
     /* This loop will decode the first (encodedLen - (encodedLen % 4)) amount of
      * data. */
     while( ( returnVal == Base64Success ) &&
-           ( pCurrBase64Symbol < ( encodedData + encodedLen ) ) )
+           ( pCurrBase64Symbol < &encodedData[ encodedLen ] ) )
     {
         uint8_t base64Index = 0;
 
