@@ -261,6 +261,8 @@ size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
 
         if( dataType == DATA_TYPE_JSON )
         {
+            /* MISRA Ref 21.6.1 [Use of snprintf] */
+            /* More details at: https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c//blob/main/MISRA.md#rule-216 */
             /* coverity[misra_c_2012_rule_21_6_violation] */
             ( void ) snprintf( getStreamRequest,
                                GET_STREAM_REQUEST_BUFFER_SIZE,
@@ -281,6 +283,8 @@ size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
         }
         else
         {
+            /* MISRA Ref 7.4.1 [Use of string literal] */
+            /* More details at: https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c//blob/main/MISRA.md#rule-74 */
             ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
                                                           GET_STREAM_REQUEST_BUFFER_SIZE,
                                                           &requestLength,
