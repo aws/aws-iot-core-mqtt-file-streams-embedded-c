@@ -199,6 +199,9 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
 MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFileDownloaderContext_t * context,
                                                                     uint8_t * message,
                                                                     size_t messageLength,
+                                                                    int32_t * fileId,
+                                                                    int32_t * blockId,
+                                                                    int32_t * blockSize,
                                                                     uint8_t * data,
                                                                     size_t * dataLength );
 /* @[declare_mqttDownloader_processReceivedDataBlock] */
