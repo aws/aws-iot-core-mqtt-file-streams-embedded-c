@@ -26,8 +26,8 @@
 #include "MQTTFileDownloader_cbor.h"
 #include "core_json.h"
 
-#define IS_CHAR_DIGIT( x )  ( ( ( x ) >= '0' ) && ( ( x ) <= '9' ) )
-#define CHAR_TO_DIGIT( x )  ( ( x ) - '0' )
+#define IS_CHAR_DIGIT( x )    ( ( ( x ) >= '0' ) && ( ( x ) <= '9' ) )
+#define CHAR_TO_DIGIT( x )    ( ( x ) - '0' )
 
 /**
  * @brief Build a string from a set of strings
@@ -350,55 +350,57 @@ static MQTTFileDownloaderStatus_t handleCborMessage( int32_t * fileId,
     return handleStatus;
 }
 
-static int getNumberFromString( char * str, size_t len, int32_t * num )
+static int getNumberFromString( char * str,
+                                size_t len,
+                                int32_t * num )
 {
-	int32_t out = 0;
-	int32_t digit;
-	int retVal = 0;
-	const int32_t maxValue = 2147483647;
+    int32_t out = 0;
+    int32_t digit;
+    int retVal = 0;
+    const int32_t maxValue = 2147483647;
 
-	/* Biggest number which can fit in an int32_t is 2147483647 which has 10 digits. */
-	assert( len <= 10 );
+    /* Biggest number which can fit in an int32_t is 2147483647 which has 10 digits. */
+    assert( len <= 10 );
 
-	for( int i = 0; i < len; i++ )
-	{
-	    if( IS_CHAR_DIGIT( str[ i ] ) != 0 )
-	    {
-	    	digit = CHAR_TO_DIGIT( str[ i ] );
+    for( int i = 0; i < len; i++ )
+    {
+        if( IS_CHAR_DIGIT( str[ i ] ) != 0 )
+        {
+            digit = CHAR_TO_DIGIT( str[ i ] );
 
-	    	if( ( maxValue / 10 ) < out )
-	    	{
-	    		/* The out value will overflow on multiplication with 10. */
-	    		retVal = -1;
-	    	}
-	    	else if( ( maxValue - digit ) < ( out * 10 ) )
-	    	{
-	    		/* The value ( out * 10 ) will overflow when the digit is
-	    		 * added to it. */
-	    		retVal = -1;
-	    	}
-	    	else
-	    	{
-	    	    out = ( out * 10 ) + digit;
-	    	}
-	    }
-	    else
-	    {
-	    	retVal = -1;
-	    }
+            if( ( maxValue / 10 ) < out )
+            {
+                /* The out value will overflow on multiplication with 10. */
+                retVal = -1;
+            }
+            else if( ( maxValue - digit ) < ( out * 10 ) )
+            {
+                /* The value ( out * 10 ) will overflow when the digit is
+                 * added to it. */
+                retVal = -1;
+            }
+            else
+            {
+                out = ( out * 10 ) + digit;
+            }
+        }
+        else
+        {
+            retVal = -1;
+        }
 
-	    if( retVal < 0 )
-	    {
-	    	break;
-	    }
-	}
+        if( retVal < 0 )
+        {
+            break;
+        }
+    }
 
-	if( retVal != -1 )
-	{
-		*num = out;
-	}
+    if( retVal != -1 )
+    {
+        *num = out;
+    }
 
-	return retVal;
+    return retVal;
 }
 
 static MQTTFileDownloaderStatus_t handleJsonMessage( int32_t * fileId,
@@ -409,12 +411,12 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( int32_t * fileId,
                                                      uint8_t * message,
                                                      size_t messageLength )
 {
-	const char fileIdQuery[] = "f";
-	size_t fileIdQueryLength = sizeof( fileIdQuery ) - 1U;
-	const char blockIdQuery[] = "i";
-	size_t blockIdQueryLength = sizeof( blockIdQuery ) - 1U;
-	const char blockSizeQuery[] = "l";
-	size_t blockSizeQueryLength = sizeof( blockSizeQuery ) - 1U;
+    const char fileIdQuery[] = "f";
+    size_t fileIdQueryLength = sizeof( fileIdQuery ) - 1U;
+    const char blockIdQuery[] = "i";
+    size_t blockIdQueryLength = sizeof( blockIdQuery ) - 1U;
+    const char blockSizeQuery[] = "l";
+    size_t blockSizeQueryLength = sizeof( blockSizeQuery ) - 1U;
     const char dataQuery[] = "p";
     size_t dataQueryLength = sizeof( dataQuery ) - 1U;
     char * dataValue;
@@ -427,17 +429,17 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( int32_t * fileId,
     Base64Status_t base64Status = Base64Success;
 
     result = JSON_Search( ( char * ) message,
-                              messageLength,
-							  fileIdQuery,
-							  fileIdQueryLength,
-							  &value,
-                              &fileBlockLength );
+                          messageLength,
+                          fileIdQuery,
+                          fileIdQueryLength,
+                          &value,
+                          &fileBlockLength );
 
     if( result == JSONSuccess )
     {
-    	if( getNumberFromString( value, fileBlockLength, fileId ) < 0 )
+        if( getNumberFromString( value, fileBlockLength, fileId ) < 0 )
         {
-    	    handleStatus = MQTTFileDownloaderDataDecodingFailed;
+            handleStatus = MQTTFileDownloaderDataDecodingFailed;
         }
     }
 
@@ -449,16 +451,17 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( int32_t * fileId,
                               blockIdQueryLength,
                               &value,
                               &fileBlockLength );
+
         if( result == JSONSuccess )
-		{
-			if( getNumberFromString( value, fileBlockLength, blockId ) < 0 )
-			{
-				handleStatus = MQTTFileDownloaderDataDecodingFailed;
-			}
-		}
+        {
+            if( getNumberFromString( value, fileBlockLength, blockId ) < 0 )
+            {
+                handleStatus = MQTTFileDownloaderDataDecodingFailed;
+            }
+        }
         else
         {
-        	handleStatus = MQTTFileDownloaderDataDecodingFailed;
+            handleStatus = MQTTFileDownloaderDataDecodingFailed;
         }
     }
 
@@ -470,17 +473,18 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( int32_t * fileId,
                               blockSizeQueryLength,
                               &value,
                               &fileBlockLength );
+
         if( result == JSONSuccess )
-		{
-			if( getNumberFromString( value, fileBlockLength, blockSize ) < 0 )
-			{
-				handleStatus = MQTTFileDownloaderDataDecodingFailed;
-			}
-		}
-		else
-		{
-			handleStatus = MQTTFileDownloaderDataDecodingFailed;
-		}
+        {
+            if( getNumberFromString( value, fileBlockLength, blockSize ) < 0 )
+            {
+                handleStatus = MQTTFileDownloaderDataDecodingFailed;
+            }
+        }
+        else
+        {
+            handleStatus = MQTTFileDownloaderDataDecodingFailed;
+        }
     }
 
     if( handleStatus = MQTTFileDownloaderSuccess )
@@ -491,10 +495,11 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( int32_t * fileId,
                               dataQueryLength,
                               &dataValue,
                               &dataValueLength );
+
         if( result != JSONSuccess )
-		{
-			handleStatus = MQTTFileDownloaderDataDecodingFailed;
-		}
+        {
+            handleStatus = MQTTFileDownloaderDataDecodingFailed;
+        }
     }
 
     if( handleStatus == MQTTFileDownloaderSuccess )
@@ -566,8 +571,8 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFi
         {
             decodingStatus = handleCborMessage( fileId,
                                                 blockId,
-												blockSize,
-												data,
+                                                blockSize,
+                                                data,
                                                 dataLength,
                                                 message,
                                                 messageLength );
