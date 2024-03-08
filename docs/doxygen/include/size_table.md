@@ -9,8 +9,8 @@
     </tr>
     <tr>
         <td>MQTTFileDownloader.c</td>
-        <td><center>0.9K</center></td>
-        <td><center>0.8K</center></td>
+        <td><center>1.1K</center></td>
+        <td><center>1.0K</center></td>
     </tr>
     <tr>
         <td>MQTTFileDownloader_cbor.c</td>
@@ -44,7 +44,7 @@
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td><b><center>10.1K</center></b></td>
-        <td><b><center>7.4K</center></b></td>
+        <td><b><center>10.3K</center></b></td>
+        <td><b><center>7.6K</center></b></td>
     </tr>
 </table>

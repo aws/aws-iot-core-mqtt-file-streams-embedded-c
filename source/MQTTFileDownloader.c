@@ -26,7 +26,14 @@
 #include "MQTTFileDownloader_cbor.h"
 #include "core_json.h"
 
+/**
+ * @brief Macro to check whether a character is an ASCII digit or not.
+ */
 #define IS_CHAR_DIGIT( x )    ( ( ( x ) >= '0' ) && ( ( x ) <= '9' ) )
+
+/**
+ * @brief Macro to convert an ASCII digit to integer.
+ */
 #define CHAR_TO_DIGIT( x )    ( ( x ) - '0' )
 
 /**
@@ -103,6 +110,24 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( int32_t * fileId,
                                                      size_t * decodedDataLength,
                                                      uint8_t * message,
                                                      size_t messageLength );
+
+/**
+ * @brief Handles and decodes the received message in JSON format.
+ *
+ * @param[in] str String which has the ASCII representation of the
+ *            number.
+ * @param[in] len Length of the string.
+ * @param[out] num Pointer to an int32_t variable which will be filled
+ *            with the parsed value. If the return value of the function
+ *            call is -1, then the value present in num is invalid.
+ *
+ * @return int32_t if the string is malformed or the decoded number
+ * cannot fit in an int32_t value then this function returns -1. On
+ * successful parsing, it returns 0.
+ */
+static int32_t getNumberFromString( char * str,
+                                    size_t len,
+                                    int32_t * num );
 
 static size_t stringBuilder( char * buffer,
                              size_t bufferSizeBytes,
@@ -350,9 +375,9 @@ static MQTTFileDownloaderStatus_t handleCborMessage( int32_t * fileId,
     return handleStatus;
 }
 
-static int getNumberFromString( char * str,
-                                size_t len,
-                                int32_t * num )
+static int32_t getNumberFromString( char * str,
+                                    size_t len,
+                                    int32_t * num )
 {
     int32_t out = 0;
     int32_t digit;
