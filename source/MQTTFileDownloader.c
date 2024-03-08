@@ -84,11 +84,11 @@ static uint16_t createTopic( char * topicBuffer,
  */
 static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
                                                      size_t messageLength,
-													 int32_t * fileId,
-													                                                      int32_t * blockId,
-													                                                      int32_t * blockSize,
-													                                                      uint8_t * decodedData,
-													                                                      size_t * decodedDataLength );
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength );
 
 /**
  * @brief Handles and decodes the received message in JSON format.
@@ -103,13 +103,13 @@ static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
-static MQTTFileDownloaderStatus_t handleJsonMessage(    uint8_t * message,
+static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
                                                      size_t messageLength,
-													 int32_t * fileId,
-													                                                      int32_t * blockId,
-													                                                      int32_t * blockSize,
-													                                                      uint8_t * decodedData,
-													                                                      size_t * decodedDataLength );
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength );
 
 /**
  * @brief Handles and decodes the received message in JSON format.
@@ -344,11 +344,11 @@ size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
 
 static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
                                                      size_t messageLength,
-													 int32_t * fileId,
-													                                                      int32_t * blockId,
-													                                                      int32_t * blockSize,
-													                                                      uint8_t * decodedData,
-													                                                      size_t * decodedDataLength )
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength )
 {
     bool cborDecodeRet = false;
     uint8_t * payload = decodedData;
@@ -430,11 +430,11 @@ static int32_t getNumberFromString( char * str,
 
 static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
                                                      size_t messageLength,
-													 int32_t * fileId,
-													                                                      int32_t * blockId,
-													                                                      int32_t * blockSize,
-													                                                      uint8_t * decodedData,
-													                                                      size_t * decodedDataLength )
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength )
 {
     const char fileIdQuery[] = "f";
     size_t fileIdQueryLength = sizeof( fileIdQuery ) - 1U;
@@ -584,23 +584,23 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFi
 
         if( context->dataType == ( uint8_t ) DATA_TYPE_JSON )
         {
-            decodingStatus = handleJsonMessage(                                                 message,
+            decodingStatus = handleJsonMessage( message,
                                                 messageLength,
-												fileId,
-												                                                blockId,
-												                                                blockSize,
-												                                                data,
-												                                                dataLength );
+                                                fileId,
+                                                blockId,
+                                                blockSize,
+                                                data,
+                                                dataLength );
         }
         else
         {
-            decodingStatus = handleCborMessage(                                                 message,
+            decodingStatus = handleCborMessage( message,
                                                 messageLength,
-												fileId,
-												                                                blockId,
-												                                                blockSize,
-												                                                data,
-												                                                dataLength );
+                                                fileId,
+                                                blockId,
+                                                blockSize,
+                                                data,
+                                                dataLength );
         }
     }
 
