@@ -121,13 +121,13 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
  *            with the parsed value. If the return value of the function
  *            call is -1, then the value present in num is invalid.
  *
- * @return int32_t if the string is malformed or the decoded number
- * cannot fit in an int32_t value then this function returns -1. On
- * successful parsing, it returns 0.
+ * @return bool if the string is malformed or the decoded number
+ * cannot fit in an int32_t value then this function returns false. On
+ * successful parsing, it returns true.
  */
-static int32_t getNumberFromString( char * str,
-                                    size_t len,
-                                    int32_t * num );
+static bool getNumberFromString( char * str,
+                                 size_t len,
+                                 int32_t * num );
 
 static size_t stringBuilder( char * buffer,
                              size_t bufferSizeBytes,
@@ -375,13 +375,13 @@ static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
     return handleStatus;
 }
 
-static int32_t getNumberFromString( char * str,
-                                    size_t len,
-                                    int32_t * num )
+static bool getNumberFromString( char * str,
+                                 size_t len,
+                                 int32_t * num )
 {
     int32_t out = 0;
     int32_t digit;
-    int retVal = 0;
+    bool retVal = true;
     const int32_t maxValue = 2147483647;
 
     /* Biggest number which can fit in an int32_t is 2147483647 which has 10 digits. */
@@ -396,13 +396,13 @@ static int32_t getNumberFromString( char * str,
             if( ( maxValue / 10 ) < out )
             {
                 /* The out value will overflow on multiplication with 10. */
-                retVal = -1;
+                retVal = false;
             }
             else if( ( maxValue - digit ) < ( out * 10 ) )
             {
                 /* The value ( out * 10 ) will overflow when the digit is
                  * added to it. */
-                retVal = -1;
+                retVal = false;
             }
             else
             {
@@ -411,16 +411,16 @@ static int32_t getNumberFromString( char * str,
         }
         else
         {
-            retVal = -1;
+            retVal = false;
         }
 
-        if( retVal < 0 )
+        if( retVal == false )
         {
             break;
         }
     }
 
-    if( retVal != -1 )
+    if( retVal == true )
     {
         *num = out;
     }
@@ -462,7 +462,7 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
 
     if( result == JSONSuccess )
     {
-        if( getNumberFromString( value, fileBlockLength, fileId ) < 0 )
+        if( getNumberFromString( value, fileBlockLength, fileId ) == false )
         {
             handleStatus = MQTTFileDownloaderDataDecodingFailed;
         }
@@ -479,7 +479,7 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
 
         if( result == JSONSuccess )
         {
-            if( getNumberFromString( value, fileBlockLength, blockId ) < 0 )
+            if( getNumberFromString( value, fileBlockLength, blockId ) == false )
             {
                 handleStatus = MQTTFileDownloaderDataDecodingFailed;
             }
@@ -501,7 +501,7 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
 
         if( result == JSONSuccess )
         {
-            if( getNumberFromString( value, fileBlockLength, blockSize ) < 0 )
+            if( getNumberFromString( value, fileBlockLength, blockSize ) == false )
             {
                 handleStatus = MQTTFileDownloaderDataDecodingFailed;
             }
