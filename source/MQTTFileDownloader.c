@@ -468,7 +468,7 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
         }
     }
 
-    if( handleStatus = MQTTFileDownloaderSuccess )
+    if( handleStatus == MQTTFileDownloaderSuccess )
     {
         result = JSON_Search( ( char * ) message,
                               messageLength,
@@ -490,7 +490,7 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
         }
     }
 
-    if( handleStatus = MQTTFileDownloaderSuccess )
+    if( handleStatus == MQTTFileDownloaderSuccess )
     {
         result = JSON_Search( ( char * ) message,
                               messageLength,
@@ -512,7 +512,7 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
         }
     }
 
-    if( handleStatus = MQTTFileDownloaderSuccess )
+    if( handleStatus == MQTTFileDownloaderSuccess )
     {
         result = JSON_Search( ( char * ) message,
                               messageLength,
