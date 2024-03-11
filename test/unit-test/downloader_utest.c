@@ -323,10 +323,16 @@ void test_processReceivedDataBlock_invalidJSONBlock( void )
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
 
-    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"wrongKey\": \"dGVzdA==\"}", strlen( "{\"wrongKey\": \"dGVzdA==\"}" ), decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"wrongKey\": \"dGVzdA==\"}", strlen( "{\"wrongKey\": \"dGVzdA==\"}" ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
     TEST_ASSERT_EQUAL( 0, dataLength );
 }
 
@@ -407,7 +413,7 @@ void test_processReceivedDataBlock_invalidEncodingJSONBlock( void )
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
-    const char * message = "{\"f\": \"12\", \"i\": \"1\", \"l\": \"512\", \"p\": \"notEncoded\"}"
+    const char * message = "{\"f\": \"12\", \"i\": \"1\", \"l\": \"512\", \"p\": \"notEncoded\"}";
 
     MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
