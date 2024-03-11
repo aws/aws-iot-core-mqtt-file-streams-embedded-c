@@ -301,10 +301,17 @@ void test_processReceivedDataBlock_processesJSONBlock( void )
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
+    const char * message = "{\"f\": \"12\", \"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, &dataLength );
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_TRUE( result );
+    TEST_ASSERT_EQUAL( 12, fileId );
+    TEST_ASSERT_EQUAL( 1, blockId );
+    TEST_ASSERT_EQUAL( 512, blockSize );
     TEST_ASSERT_EQUAL( 4, dataLength );
 }
 
@@ -323,6 +330,72 @@ void test_processReceivedDataBlock_invalidJSONBlock( void )
     TEST_ASSERT_EQUAL( 0, dataLength );
 }
 
+void test_processReceivedDataBlock_invalidJSONBlock_fileIdNotPresent( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
+    const char * message = "{\"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
+
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
+
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderDataDecodingFailed, result );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+}
+
+void test_processReceivedDataBlock_invalidJSONBlock_blockIdNotPresent( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
+    const char * message = "{\"f\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
+
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
+
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderDataDecodingFailed, result );
+    TEST_ASSERT_EQUAL( 1, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+}
+
+void test_processReceivedDataBlock_invalidJSONBlock_blockSizeNotPresent( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
+    const char * message = "{\"f\": \"1\", \"i\": \"12\", \"p\": \"dGVzdA==\"}";
+
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
+
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderDataDecodingFailed, result );
+    TEST_ASSERT_EQUAL( 1, fileId );
+    TEST_ASSERT_EQUAL( 12, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+}
+
 void test_processReceivedDataBlock_invalidEncodingJSONBlock( void )
 {
     MqttFileDownloaderContext_t context = { 0 };
@@ -331,10 +404,17 @@ void test_processReceivedDataBlock_invalidEncodingJSONBlock( void )
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
+    const char * message = "{\"f\": \"12\", \"i\": \"1\", \"l\": \"512\", \"p\": \"notEncoded\"}"
 
-    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"notEncoded\"}", strlen( "{\"p\": \"notEncoded\"}" ), decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
+    TEST_ASSERT_EQUAL( 12, fileId );
+    TEST_ASSERT_EQUAL( 1, blockId );
+    TEST_ASSERT_EQUAL( 512, blockSize );
     TEST_ASSERT_EQUAL( 0, dataLength );
 }
 
@@ -348,6 +428,12 @@ void test_processReceivedDataBlock_processesCBORBlock( void )
     size_t expectedProcessedDataLength = 12345U;
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
+    const int32_t expectedFileId = 20;
+    const int32_t expectedBlockId = 30;
+    const int32_t expectedBlockSize = 40;
 
     CBOR_Decode_GetStreamResponseMessage_ExpectAndReturn( ( const uint8_t * ) validCBORMsg, strlen( validCBORMsg ), NULL, NULL, NULL, NULL, NULL, true );
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_fileId();
@@ -355,11 +441,17 @@ void test_processReceivedDataBlock_processesCBORBlock( void )
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_blockId();
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_payload();
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_payloadSize();
+    CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_fileId( &expectedFileId );
+    CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_blockId( &expectedBlockId );
+    CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_blockSize( &expectedBlockSize );
     CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_payloadSize( &expectedProcessedDataLength );
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) validCBORMsg, strlen( validCBORMsg ), decodedData, &dataLength );
+    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) validCBORMsg, strlen( validCBORMsg ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_TRUE( result );
+    TEST_ASSERT_EQUAL( expectedFileId, fileId );
+    TEST_ASSERT_EQUAL( expectedBlockId, blockId );
+    TEST_ASSERT_EQUAL( expectedBlockSize, blockSize );
     TEST_ASSERT_EQUAL( expectedProcessedDataLength, dataLength );
 }
 
@@ -373,6 +465,9 @@ void test_processReceivedDataBlock_invalidCBORBlock( void )
     size_t notExpectedProcessedDataLength = 12345U;
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
 
     CBOR_Decode_GetStreamResponseMessage_ExpectAndReturn( ( const uint8_t * ) invalidCBORMsg, strlen( invalidCBORMsg ), NULL, NULL, NULL, NULL, NULL, false );
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_fileId();
@@ -382,10 +477,13 @@ void test_processReceivedDataBlock_invalidCBORBlock( void )
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_payloadSize();
     CBOR_Decode_GetStreamResponseMessage_ReturnThruPtr_payloadSize( &notExpectedProcessedDataLength );
 
-    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) invalidCBORMsg, strlen( invalidCBORMsg ), decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) invalidCBORMsg, strlen( invalidCBORMsg ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
     TEST_ASSERT_EQUAL( 0, dataLength );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
 }
 
 void test_processReceivedDataBlock_returnsFailureWhenMessageIsNull( void )
@@ -396,9 +494,16 @@ void test_processReceivedDataBlock_returnsFailureWhenMessageIsNull( void )
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
 
-    uintResult = mqttDownloader_processReceivedDataBlock( &context, NULL, strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, &dataLength );
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, NULL, strlen( "{\"p\": \"dGVzdA==\"}" ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
 }
 
 void test_processReceivedDataBlock_returnsFailureWhenMessageLengthZero( void )
@@ -409,9 +514,16 @@ void test_processReceivedDataBlock_returnsFailureWhenMessageLengthZero( void )
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
 
-    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", 0U, decodedData, &dataLength );
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", 0U, &fileId, &blockId, &blockSize, decodedData, &dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
 }
 
 void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
@@ -421,9 +533,16 @@ void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
     context.dataType = DATA_TYPE_JSON;
 
     size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;    
 
-    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), NULL, &dataLength );
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), &fileId, &blockId, &blockSize, NULL, &dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
 }
 
 void test_processReceivedDataBlock_returnsFailureWhenDataLengthIsNull( void )
@@ -434,7 +553,64 @@ void test_processReceivedDataBlock_returnsFailureWhenDataLengthIsNull( void )
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
     size_t * dataLength = NULL;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
 
-    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), decodedData, dataLength );
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), &fileId, &blockId, &blockSize, decodedData, dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
+}
+
+void test_processReceivedDataBlock_returnsFailureWhenFileIdIsNull( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+    int32_t blockId = 0;
+    int32_t blockSize = 0;
+
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), NULL, &blockId, &blockSize, decodedData, &dataLength );
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
+}
+
+void test_processReceivedDataBlock_returnsFailureWhenBlockIdIsNull( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockSize = 0;
+
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), &fileId, NULL, &blockSize, decodedData, &dataLength );
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockSize );
+}
+
+void test_processReceivedDataBlock_returnsFailureWhenBlockSizeIsNull( void )
+{
+    MqttFileDownloaderContext_t context = { 0 };
+
+    context.dataType = DATA_TYPE_JSON;
+
+    uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
+    size_t dataLength = 0;
+    int32_t fileId = 0;
+    int32_t blockId = 0;
+
+    uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), &fileId, &blockId, NULL, decodedData, &dataLength );
+    TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
+    TEST_ASSERT_EQUAL( 0, dataLength );
+    TEST_ASSERT_EQUAL( 0, fileId );
+    TEST_ASSERT_EQUAL( 0, blockId );
 }

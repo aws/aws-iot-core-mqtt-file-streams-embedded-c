@@ -449,7 +449,7 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
     size_t fileBlockLength;
     char * value;
     JSONStatus_t result = JSONSuccess;
-    MQTTFileDownloaderStatus_t handleStatus = MQTTFileDownloaderSuccess;
+    MQTTFileDownloaderStatus_t handleStatus = MQTTFileDownloaderDataDecodingFailed;
 
     Base64Status_t base64Status = Base64Success;
 
@@ -462,9 +462,9 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
 
     if( result == JSONSuccess )
     {
-        if( getNumberFromString( value, fileBlockLength, fileId ) == false )
+        if( getNumberFromString( value, fileBlockLength, fileId ) == true )
         {
-            handleStatus = MQTTFileDownloaderDataDecodingFailed;
+            handleStatus = MQTTFileDownloaderSuccess;
         }
     }
 
@@ -578,7 +578,10 @@ MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFi
 {
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderFailure;
 
-    if( ( message != NULL ) && ( messageLength != 0U ) && ( data != NULL ) && ( dataLength != NULL ) )
+    if( ( message != NULL ) && ( messageLength != 0U ) &&
+        ( data != NULL ) && ( dataLength != NULL ) &&
+        ( fileId != NULL ) && ( blockId != NULL ) &&
+        ( blockSize != NULL ) )
     {
         ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
 
