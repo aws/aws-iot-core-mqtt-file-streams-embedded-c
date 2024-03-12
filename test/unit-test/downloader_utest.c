@@ -407,7 +407,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockSizeIsTooBig( void )
 
     const char * message2 = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"2147483649\", \"p\": \"dGVzdA==\"}";
 
-    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message2, strlen( message2 ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
+    result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message2, strlen( message2 ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
     TEST_ASSERT_EQUAL( 0, fileId );
