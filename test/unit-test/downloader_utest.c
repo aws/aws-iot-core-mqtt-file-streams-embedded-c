@@ -349,7 +349,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_fileIdNotPresent( void )
     int32_t blockSize = 0;
     const char * message = "{\"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( MQTTFileDownloaderDataDecodingFailed, result );
     TEST_ASSERT_EQUAL( 0, fileId );
@@ -371,7 +371,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_blockIdNotPresent( void )
     int32_t blockSize = 0;
     const char * message = "{\"f\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( MQTTFileDownloaderDataDecodingFailed, result );
     TEST_ASSERT_EQUAL( 1, fileId );
@@ -393,7 +393,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_blockSizeNotPresent( void )
     int32_t blockSize = 0;
     const char * message = "{\"f\": \"1\", \"i\": \"12\", \"p\": \"dGVzdA==\"}";
 
-    bool result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
+    MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( MQTTFileDownloaderDataDecodingFailed, result );
     TEST_ASSERT_EQUAL( 1, fileId );
