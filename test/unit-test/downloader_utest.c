@@ -370,13 +370,13 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockSizeNotANumber( void )
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
-    const char * message = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"size\", \"p\": \"dGVzdA==\"}";
+    const char * message = "{\"f\": \"10\", \"i\": \"1\", \"l\": \"size\", \"p\": \"dGVzdA==\"}";
 
     MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message, strlen( message ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
-    TEST_ASSERT_EQUAL( 0, fileId );
-    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 10, fileId );
+    TEST_ASSERT_EQUAL( 1, blockId );
     TEST_ASSERT_EQUAL( 0, blockSize );
     TEST_ASSERT_EQUAL( 0, dataLength );
 }
@@ -395,23 +395,23 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockSizeIsTooBig( void )
     int32_t blockId = 0;
     int32_t blockSize = 0;
 
-    const char * message1 = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"5147483647\", \"p\": \"dGVzdA==\"}";
+    const char * message1 = "{\"f\": \"20\", \"i\": \"56\", \"l\": \"5147483647\", \"p\": \"dGVzdA==\"}";
 
     MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message1, strlen( message1 ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
-    TEST_ASSERT_EQUAL( 0, fileId );
-    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 20, fileId );
+    TEST_ASSERT_EQUAL( 56, blockId );
     TEST_ASSERT_EQUAL( 0, blockSize );
     TEST_ASSERT_EQUAL( 0, dataLength );
 
-    const char * message2 = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"2147483649\", \"p\": \"dGVzdA==\"}";
+    const char * message2 = "{\"f\": \"20\", \"i\": \"56\", \"l\": \"2147483649\", \"p\": \"dGVzdA==\"}";
 
     result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message2, strlen( message2 ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
 
     TEST_ASSERT_EQUAL( 7, result );
-    TEST_ASSERT_EQUAL( 0, fileId );
-    TEST_ASSERT_EQUAL( 0, blockId );
+    TEST_ASSERT_EQUAL( 20, fileId );
+    TEST_ASSERT_EQUAL( 56, blockId );
     TEST_ASSERT_EQUAL( 0, blockSize );
     TEST_ASSERT_EQUAL( 0, dataLength );
 }
@@ -521,7 +521,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_payloadNotPresent( void )
     TEST_ASSERT_EQUAL( MQTTFileDownloaderDataDecodingFailed, result );
     TEST_ASSERT_EQUAL( 1, fileId );
     TEST_ASSERT_EQUAL( 12, blockId );
-    TEST_ASSERT_EQUAL( 0, blockSize );
+    TEST_ASSERT_EQUAL( 512, blockSize );
     TEST_ASSERT_EQUAL( 0, dataLength );
 }
 
