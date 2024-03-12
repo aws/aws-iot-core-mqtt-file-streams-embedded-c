@@ -394,7 +394,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockSizeIsTooBig( void )
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
-    
+
     const char * message1 = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"5147483647\", \"p\": \"dGVzdA==\"}";
 
     MQTTFileDownloaderStatus_t result = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) message1, strlen( message1 ), &fileId, &blockId, &blockSize, decodedData, &dataLength );
@@ -664,7 +664,7 @@ void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
     size_t dataLength = 0;
     int32_t fileId = 0;
     int32_t blockId = 0;
-    int32_t blockSize = 0;    
+    int32_t blockSize = 0;
 
     uintResult = mqttDownloader_processReceivedDataBlock( &context, ( uint8_t * ) "{\"p\": \"dGVzdA==\"}", strlen( "{\"p\": \"dGVzdA==\"}" ), &fileId, &blockId, &blockSize, NULL, &dataLength );
     TEST_ASSERT_EQUAL( MQTTFileDownloaderFailure, uintResult );
