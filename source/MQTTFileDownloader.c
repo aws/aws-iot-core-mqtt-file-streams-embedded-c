@@ -95,11 +95,11 @@ static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
  *
  * @param[in] message Incoming MQTT message received.
  * @param[in] messageLength Length of the MQTT message received.
- * @param[out] decodedData Buffer to place the decoded data in.
- * @param[out] decodedDataLength Length of decoded data.
  * @param[out] fileId ID of the file to which the data block belongs.
  * @param[out] blockId ID of the received block.
  * @param[out] blockSize Size of the receive block in bytes.
+ * @param[out] decodedData Buffer to place the decoded data in.
+ * @param[out] decodedDataLength Length of decoded data.
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
@@ -112,20 +112,21 @@ static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
                                                      size_t * decodedDataLength );
 
 /**
- * @brief Handles and decodes the received message in JSON format.
+ * @brief Parses C-string interpreting its contents as a POSITIVE
+ *        int32_t number.
  *
  * @param[in] str String which has the ASCII representation of the
  *            number.
  * @param[in] len Length of the string.
  * @param[out] num Pointer to an int32_t variable which will be filled
  *            with the parsed value. If the return value of the function
- *            call is -1, then the value present in num is invalid.
+ *            call is false, then the value present in num is invalid.
  *
  * @return bool if the string is malformed or the decoded number
  * cannot fit in an int32_t value then this function returns false. On
  * successful parsing, it returns true.
  */
-static bool getNumberFromString( char * str,
+static bool getNumberFromString( const char * str,
                                  size_t len,
                                  int32_t * num );
 
@@ -375,7 +376,7 @@ static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
     return handleStatus;
 }
 
-static bool getNumberFromString( char * str,
+static bool getNumberFromString( const char * str,
                                  size_t len,
                                  int32_t * num )
 {
@@ -387,11 +388,11 @@ static bool getNumberFromString( char * str,
     /* Biggest number which can fit in an int32_t is 2147483647 which has 10 digits. */
     assert( len <= 10 );
 
-    for( int i = 0; i < len; i++ )
+    for( size_t uxIndex = 0U; uxIndex < len; uxIndex++ )
     {
-        if( IS_CHAR_DIGIT( str[ i ] ) != 0 )
+        if( IS_CHAR_DIGIT( str[ uxIndex ] ) == true )
         {
-            digit = CHAR_TO_DIGIT( str[ i ] );
+            digit = CHAR_TO_DIGIT( str[ uxIndex ] );
 
             if( ( maxValue / 10 ) < out )
             {
