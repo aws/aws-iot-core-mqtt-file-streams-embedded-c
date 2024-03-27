@@ -27,6 +27,16 @@
 #include "core_json.h"
 
 /**
+ * @brief Macro to check whether a character is an ASCII digit or not.
+ */
+#define IS_CHAR_DIGIT( x )    ( ( ( x ) >= '0' ) && ( ( x ) <= '9' ) )
+
+/**
+ * @brief Macro to convert an ASCII digit to integer.
+ */
+#define CHAR_TO_DIGIT( x )    ( ( x ) - '0' )
+
+/**
  * @brief Build a string from a set of strings
  *
  * @param[in] buffer Buffer to place the output string in.
@@ -64,30 +74,61 @@ static uint16_t createTopic( char * topicBuffer,
  *
  * @param[in] message Incoming MQTT message received.
  * @param[in] messageLength Length of the MQTT message received.
+ * @param[out] fileId ID of the file to which the data block belongs.
+ * @param[out] blockId ID of the received block.
+ * @param[out] blockSize Size of the receive block in bytes.
  * @param[out] decodedData Buffer to place the decoded data in.
  * @param[out] decodedDataLength Length of decoded data.
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
-static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
-                                                     size_t * decodedDataLength,
-                                                     const uint8_t * message,
-                                                     size_t messageLength );
+static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
+                                                     size_t messageLength,
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength );
 
 /**
  * @brief Handles and decodes the received message in JSON format.
  *
  * @param[in] message Incoming MQTT message received.
  * @param[in] messageLength Length of the MQTT message received.
+ * @param[out] fileId ID of the file to which the data block belongs.
+ * @param[out] blockId ID of the received block.
+ * @param[out] blockSize Size of the receive block in bytes.
  * @param[out] decodedData Buffer to place the decoded data in.
  * @param[out] decodedDataLength Length of decoded data.
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
-static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
-                                                     size_t * decodedDataLength,
-                                                     uint8_t * message,
-                                                     size_t messageLength );
+static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
+                                                     size_t messageLength,
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength );
+
+/**
+ * @brief Parses C-string interpreting its contents as a POSITIVE
+ *        int32_t number.
+ *
+ * @param[in] str String which has the ASCII representation of the
+ *            number.
+ * @param[in] len Length of the string.
+ * @param[out] num Pointer to an int32_t variable which will be filled
+ *            with the parsed value. If the return value of the function
+ *            call is false, then the value present in num is invalid.
+ *
+ * @return bool if the string is malformed or the decoded number
+ * cannot fit in an int32_t value then this function returns false. On
+ * successful parsing, it returns true.
+ */
+static bool getNumberFromString( const char * str,
+                                 size_t len,
+                                 int32_t * num );
 
 static size_t stringBuilder( char * buffer,
                              size_t bufferSizeBytes,
@@ -302,24 +343,24 @@ size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
     return requestLength;
 }
 
-static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
-                                                     size_t * decodedDataLength,
-                                                     const uint8_t * message,
-                                                     size_t messageLength )
+static MQTTFileDownloaderStatus_t handleCborMessage( const uint8_t * message,
+                                                     size_t messageLength,
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength )
 {
     bool cborDecodeRet = false;
-    int32_t fileId = 0;
-    int32_t blockId = 0;
-    int32_t blockSize = 0;
     uint8_t * payload = decodedData;
     size_t payloadSize = mqttFileDownloader_CONFIG_BLOCK_SIZE;
     MQTTFileDownloaderStatus_t handleStatus = MQTTFileDownloaderSuccess;
 
     cborDecodeRet = CBOR_Decode_GetStreamResponseMessage( message,
                                                           messageLength,
-                                                          &fileId,
-                                                          &blockId,
-                                                          &blockSize,
+                                                          fileId,
+                                                          blockId,
+                                                          blockSize,
                                                           &payload,
                                                           &payloadSize );
 
@@ -335,30 +376,156 @@ static MQTTFileDownloaderStatus_t handleCborMessage( uint8_t * decodedData,
     return handleStatus;
 }
 
-static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * decodedData,
-                                                     size_t * decodedDataLength,
-                                                     uint8_t * message,
-                                                     size_t messageLength )
+static bool getNumberFromString( const char * str,
+                                 size_t len,
+                                 int32_t * num )
 {
+    int32_t out = 0;
+    int32_t digit;
+    bool retVal = true;
+    const int32_t maxValue = 2147483647;
+
+    /* Biggest number which can fit in an int32_t is 2147483647 which has 10 digits. */
+    assert( len <= 10 );
+
+    for( size_t uxIndex = 0U; uxIndex < len; uxIndex++ )
+    {
+        if( IS_CHAR_DIGIT( str[ uxIndex ] ) == true )
+        {
+            digit = CHAR_TO_DIGIT( str[ uxIndex ] );
+
+            if( ( maxValue / 10 ) < out )
+            {
+                /* The out value will overflow on multiplication with 10. */
+                retVal = false;
+            }
+            else if( ( maxValue - digit ) < ( out * 10 ) )
+            {
+                /* The value ( out * 10 ) will overflow when the digit is
+                 * added to it. */
+                retVal = false;
+            }
+            else
+            {
+                out = ( out * 10 ) + digit;
+            }
+        }
+        else
+        {
+            retVal = false;
+        }
+
+        if( retVal == false )
+        {
+            break;
+        }
+    }
+
+    if( retVal == true )
+    {
+        *num = out;
+    }
+
+    return retVal;
+}
+
+static MQTTFileDownloaderStatus_t handleJsonMessage( uint8_t * message,
+                                                     size_t messageLength,
+                                                     int32_t * fileId,
+                                                     int32_t * blockId,
+                                                     int32_t * blockSize,
+                                                     uint8_t * decodedData,
+                                                     size_t * decodedDataLength )
+{
+    const char fileIdQuery[] = "f";
+    size_t fileIdQueryLength = sizeof( fileIdQuery ) - 1U;
+    const char blockIdQuery[] = "i";
+    size_t blockIdQueryLength = sizeof( blockIdQuery ) - 1U;
+    const char blockSizeQuery[] = "l";
+    size_t blockSizeQueryLength = sizeof( blockSizeQuery ) - 1U;
     const char dataQuery[] = "p";
     size_t dataQueryLength = sizeof( dataQuery ) - 1U;
     char * dataValue;
     size_t dataValueLength;
+    size_t fileBlockLength;
+    char * value;
     JSONStatus_t result = JSONSuccess;
-    MQTTFileDownloaderStatus_t handleStatus = MQTTFileDownloaderSuccess;
+    MQTTFileDownloaderStatus_t handleStatus = MQTTFileDownloaderDataDecodingFailed;
 
     Base64Status_t base64Status = Base64Success;
 
     result = JSON_Search( ( char * ) message,
                           messageLength,
-                          dataQuery,
-                          dataQueryLength,
-                          &dataValue,
-                          &dataValueLength );
+                          fileIdQuery,
+                          fileIdQueryLength,
+                          &value,
+                          &fileBlockLength );
 
-    if( result != JSONSuccess )
+    if( result == JSONSuccess )
     {
-        handleStatus = MQTTFileDownloaderDataDecodingFailed;
+        if( getNumberFromString( value, fileBlockLength, fileId ) == true )
+        {
+            handleStatus = MQTTFileDownloaderSuccess;
+        }
+    }
+
+    if( handleStatus == MQTTFileDownloaderSuccess )
+    {
+        result = JSON_Search( ( char * ) message,
+                              messageLength,
+                              blockIdQuery,
+                              blockIdQueryLength,
+                              &value,
+                              &fileBlockLength );
+
+        if( result == JSONSuccess )
+        {
+            if( getNumberFromString( value, fileBlockLength, blockId ) == false )
+            {
+                handleStatus = MQTTFileDownloaderDataDecodingFailed;
+            }
+        }
+        else
+        {
+            handleStatus = MQTTFileDownloaderDataDecodingFailed;
+        }
+    }
+
+    if( handleStatus == MQTTFileDownloaderSuccess )
+    {
+        result = JSON_Search( ( char * ) message,
+                              messageLength,
+                              blockSizeQuery,
+                              blockSizeQueryLength,
+                              &value,
+                              &fileBlockLength );
+
+        if( result == JSONSuccess )
+        {
+            if( getNumberFromString( value, fileBlockLength, blockSize ) == false )
+            {
+                handleStatus = MQTTFileDownloaderDataDecodingFailed;
+            }
+        }
+        else
+        {
+            handleStatus = MQTTFileDownloaderDataDecodingFailed;
+        }
+    }
+
+    if( handleStatus == MQTTFileDownloaderSuccess )
+    {
+        result = JSON_Search( ( char * ) message,
+                              messageLength,
+                              dataQuery,
+                              dataQueryLength,
+                              &dataValue,
+                              &dataValueLength );
+
+        if( result != JSONSuccess )
+        {
+            handleStatus = MQTTFileDownloaderDataDecodingFailed;
+        }
     }
 
     if( handleStatus == MQTTFileDownloaderSuccess )
@@ -404,28 +571,40 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
 MQTTFileDownloaderStatus_t mqttDownloader_processReceivedDataBlock( const MqttFileDownloaderContext_t * context,
                                                                     uint8_t * message,
                                                                     size_t messageLength,
+                                                                    int32_t * fileId,
+                                                                    int32_t * blockId,
+                                                                    int32_t * blockSize,
                                                                     uint8_t * data,
                                                                     size_t * dataLength )
 {
     MQTTFileDownloaderStatus_t decodingStatus = MQTTFileDownloaderFailure;
 
-    if( ( message != NULL ) && ( messageLength != 0U ) && ( data != NULL ) && ( dataLength != NULL ) )
+    if( ( message != NULL ) && ( messageLength != 0U ) &&
+        ( data != NULL ) && ( dataLength != NULL ) &&
+        ( fileId != NULL ) && ( blockId != NULL ) &&
+        ( blockSize != NULL ) )
     {
         ( void ) memset( data, ( int32_t ) '\0', mqttFileDownloader_CONFIG_BLOCK_SIZE );
 
         if( context->dataType == ( uint8_t ) DATA_TYPE_JSON )
         {
-            decodingStatus = handleJsonMessage( data,
-                                                dataLength,
-                                                message,
-                                                messageLength );
+            decodingStatus = handleJsonMessage( message,
+                                                messageLength,
+                                                fileId,
+                                                blockId,
+                                                blockSize,
+                                                data,
+                                                dataLength );
         }
         else
         {
-            decodingStatus = handleCborMessage( data,
-                                                dataLength,
-                                                message,
-                                                messageLength );
+            decodingStatus = handleCborMessage( message,
+                                                messageLength,
+                                                fileId,
+                                                blockId,
+                                                blockSize,
+                                                data,
+                                                dataLength );
         }
     }
 
