@@ -190,11 +190,11 @@ MQTTFileDownloaderStatus_t mqttDownloader_isDataBlockReceived( const MqttFileDow
  * @param[in] context MQTT file downloader context pointer.
  * @param[in] message Incoming MQTT message containing data block.
  * @param[in] messageLength Incoming MQTT message length.
- * @param[out] data Decoded data block.
- * @param[in] dataLength Decoded data block length.
  * @param[out] fileId ID of the file to which the data block belongs.
  * @param[out] blockId ID of the received block.
  * @param[out] blockSize Size of the receive block in bytes.
+ * @param[out] data Decoded data block.
+ * @param[in] dataLength Decoded data block length.
  *
  * @return returns True if the message is handled else False.
  */

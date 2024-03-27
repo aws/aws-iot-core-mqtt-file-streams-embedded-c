@@ -298,7 +298,7 @@ void test_processReceivedDataBlock_processesJSONBlock( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -320,7 +320,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_fileIdNotANumber( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -342,7 +342,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockIdNotANumber( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -364,7 +364,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockSizeNotANumber( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -386,7 +386,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockSizeNegative( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -408,7 +408,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_fileIdNegative( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -430,7 +430,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockIdNegative( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -454,7 +454,7 @@ void test_processReceivedDataBlock__invalidJSONBlock_blockSizeIsTooBig( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -489,7 +489,7 @@ void test_processReceivedDataBlock_invalidJSONBlock( void )
     const char * message = "{\"wrongKey\": \"dGVzdA==\"}";
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -510,7 +510,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_fileIdNotPresent( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -532,7 +532,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_blockIdNotPresent( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -554,7 +554,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_blockSizeNotPresent( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -576,7 +576,7 @@ void test_processReceivedDataBlock_invalidJSONBlock_payloadNotPresent( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -598,7 +598,7 @@ void test_processReceivedDataBlock_invalidEncodingJSONBlock( void )
     context.dataType = DATA_TYPE_JSON;
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -622,7 +622,7 @@ void test_processReceivedDataBlock_processesCBORBlock( void )
     char * validCBORMsg = "aValidCBORMsg";
     size_t expectedProcessedDataLength = 12345U;
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -659,7 +659,7 @@ void test_processReceivedDataBlock_invalidCBORBlock( void )
     char * invalidCBORMsg = "invalidCBORMsg";
     size_t notExpectedProcessedDataLength = 12345U;
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -690,7 +690,7 @@ void test_processReceivedDataBlock_returnsFailureWhenMessageIsNull( void )
     const char * message = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -712,7 +712,7 @@ void test_processReceivedDataBlock_returnsFailureWhenMessageLengthZero( void )
     const char * message = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -733,7 +733,7 @@ void test_processReceivedDataBlock_returnsFailureWhenDataIsNull( void )
 
     const char * message = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
@@ -773,7 +773,7 @@ void test_processReceivedDataBlock_returnsFailureWhenFileIdIsNull( void )
     const char * message = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t blockId = 0;
     int32_t blockSize = 0;
 
@@ -793,7 +793,7 @@ void test_processReceivedDataBlock_returnsFailureWhenBlockIdIsNull( void )
     const char * message = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockSize = 0;
 
@@ -813,7 +813,7 @@ void test_processReceivedDataBlock_returnsFailureWhenBlockSizeIsNull( void )
     const char * message = "{\"f\": \"0\", \"i\": \"1\", \"l\": \"512\", \"p\": \"dGVzdA==\"}";
 
     uint8_t decodedData[ mqttFileDownloader_CONFIG_BLOCK_SIZE ];
-    size_t dataLength = 0;
+    size_t dataLength = 0U;
     int32_t fileId = 0;
     int32_t blockId = 0;
 

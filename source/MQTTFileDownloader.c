@@ -74,11 +74,11 @@ static uint16_t createTopic( char * topicBuffer,
  *
  * @param[in] message Incoming MQTT message received.
  * @param[in] messageLength Length of the MQTT message received.
- * @param[out] decodedData Buffer to place the decoded data in.
- * @param[out] decodedDataLength Length of decoded data.
  * @param[out] fileId ID of the file to which the data block belongs.
  * @param[out] blockId ID of the received block.
  * @param[out] blockSize Size of the receive block in bytes.
+ * @param[out] decodedData Buffer to place the decoded data in.
+ * @param[out] decodedDataLength Length of decoded data.
  *
  * @return uint8_t returns appropriate MQTT File Downloader Status.
  */
