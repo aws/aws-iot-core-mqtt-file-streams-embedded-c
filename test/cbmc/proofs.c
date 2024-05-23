@@ -127,6 +127,9 @@ void proof_mqttDownloader_processReceivedDataBlock( void )
     MqttFileDownloaderContext_t context = { 0 };
     uint8_t * message;
     size_t messageLength;
+    int32_t fileId;
+    int32_t blockId;
+    int32_t blockSize;
     uint8_t * data;
     size_t dataLength;
     bool ret;
@@ -143,6 +146,9 @@ void proof_mqttDownloader_processReceivedDataBlock( void )
     ret = mqttDownloader_processReceivedDataBlock( &context,
                                                    message,
                                                    messageLength,
+                                                   &fileId,
+                                                   &blockId,
+                                                   &blockSize,
                                                    data,
                                                    &dataLength );
 }
