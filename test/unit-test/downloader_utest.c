@@ -626,9 +626,9 @@ void test_processReceivedDataBlock_processesCBORBlock( void )
     int32_t fileId = 0;
     int32_t blockId = 0;
     int32_t blockSize = 0;
-    const int32_t expectedFileId = 20;
-    const int32_t expectedBlockId = 30;
-    const int32_t expectedBlockSize = 40;
+    int32_t expectedFileId = 20;
+    int32_t expectedBlockId = 30;
+    int32_t expectedBlockSize = 40;
 
     CBOR_Decode_GetStreamResponseMessage_ExpectAndReturn( ( const uint8_t * ) validCBORMsg, strlen( validCBORMsg ), NULL, NULL, NULL, NULL, NULL, true );
     CBOR_Decode_GetStreamResponseMessage_IgnoreArg_fileId();
