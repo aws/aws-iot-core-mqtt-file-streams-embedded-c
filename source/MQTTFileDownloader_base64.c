@@ -1,5 +1,5 @@
 /*
- * AWS IoT Core MQTT File Streams Embedded C v1.0.0
+ * AWS IoT Core MQTT File Streams Embedded C v1.1.0
  * Copyright (C) 2023 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT
  *
