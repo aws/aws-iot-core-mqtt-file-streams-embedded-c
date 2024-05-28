@@ -191,9 +191,6 @@ static Base64Status_t preprocessBase64Index( uint8_t base64Index,
     int64_t numPaddingVal;
     int64_t numWhitespaceVal;
 
-    assert( numPadding != NULL );
-    assert( numWhitespace != NULL );
-
     numPaddingVal = *numPadding;
     numWhitespaceVal = *numWhitespace;
 
@@ -263,8 +260,6 @@ static void updateBase64DecodingBuffer( const uint8_t base64Index,
     uint32_t base64IndexBuffer;
     uint32_t numDataInBuffer;
 
-    assert( base64IndexBufferPtr != NULL );
-    assert( numDataIndexBuffer != NULL );
     assert( base64Index <= SYMBOL_TO_INDEX_MAP_VALUE_UPPER_BOUND );
 
     base64IndexBuffer = *base64IndexBufferPtr;
@@ -322,12 +317,8 @@ static Base64Status_t decodeBase64IndexBuffer( uint32_t * base64IndexBufferPtr,
     uint32_t numDataInBuffer;
     uint32_t numDataToWrite;
 
-    assert( base64IndexBufferPtr != NULL );
-    assert( numDataIndexBuffer != NULL );
     assert( ( *numDataIndexBuffer == 2U ) || ( *numDataIndexBuffer == 3U ) ||
             ( *numDataIndexBuffer == 4U ) );
-    assert( dest != NULL );
-    assert( outputLength != NULL );
 
     outputLen = *outputLength;
     base64IndexBuffer = *base64IndexBufferPtr;
