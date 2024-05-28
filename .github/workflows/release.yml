@@ -7,7 +7,7 @@ on:
         description: 'Commit ID to tag and create a release for'
         required: true
       version_number:
-        description: 'Release Version Number (Eg, v1.0.0)'
+        description: 'Release Version Number (Eg, v1.1.0)'
         required: true
 
 jobs:
