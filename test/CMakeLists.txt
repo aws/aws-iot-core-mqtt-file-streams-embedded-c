@@ -80,6 +80,9 @@ if( COV_ANALYSIS )
   # JOBS public include path.
   target_include_directories( coverity_analysis PUBLIC ${MQTT_FILE_DOWNLOADER_INCLUDES} )
 
+  # Build MQTT streams library target without custom config dependency.
+  target_compile_definitions( coverity_analysis PUBLIC MQTT_STREAMS_DO_NOT_USE_CUSTOM_CONFIG=1 )
+
   # Build HTTP library target without logging
   target_compile_options(coverity_analysis PUBLIC -DNDEBUG )
 
@@ -132,8 +135,7 @@ if( UNITTEST )
   # Include build configuration for unit tests.
   add_subdirectory(unit-test)
 
-  # ==================================== Coverage Analysis configuration
-  # ========================================
+  # ================= Coverage Analysis configuration =================
 
   # Add a target for running coverage on tests.
   add_custom_target(
