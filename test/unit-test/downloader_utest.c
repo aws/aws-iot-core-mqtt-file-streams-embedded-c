@@ -17,6 +17,7 @@
 #include "mock_MQTTFileDownloader_cbor.h"
 
 #include "MQTTFileDownloader.h"
+#include "MQTTFileDownloader_defaults.h"
 
 #define GET_STREAM_REQUEST_BUFFER_SIZE    256U
 

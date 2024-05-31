@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "MQTTFileDownloader.h"
+#include "MQTTFileDownloader_defaults.h"
 #include "MQTTFileDownloader_base64.h"
 #include "MQTTFileDownloader_cbor.h"
 #include "core_json.h"

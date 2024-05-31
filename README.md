@@ -4,6 +4,28 @@ In AWS IoT, a **stream** is a publicly addressable resource that is an abstracti
 
 More information about streams and MQTT based file delivery can be found [here](https://docs.aws.amazon.com/iot/latest/developerguide/mqtt-based-file-delivery.html)
 
+## MQTT File Streams Config File
+
+The MQTT file streams library exposes build configuration macros that are required for
+building the library. A list of all the configurations and their default values
+are defined in
+[MQTTFileDownloader_defaults.h](source/include/MQTTFileDownloader_defaults.h). To
+provide custom values for the configuration macros, a custom config file named
+`MQTTFileDownloader_config.h` can be provided by the application to the library.
+
+By default, a `MQTTFileDownloader_config.h` custom config is required to build the
+library. To disable this requirement and build the library with default
+configuration values, provide `MQTT_STREAMS_DO_NOT_USE_CUSTOM_CONFIG` as a compile time
+preprocessor macro.
+
+**Thus, the MQTT library can be built by either**:
+
+- Defining a `MQTTFileDownloader_config.h` file in the application, and adding it to the
+  include directories list of the library
+  **OR**
+- Defining the `MQTT_STREAMS_DO_NOT_USE_CUSTOM_CONFIG` preprocessor macro for the
+  library build.
+
 ### MQTT File Streams library workflow
 
 ![alt text](./docs/doxygen/images/MqttStreams_flowChart.jpg)

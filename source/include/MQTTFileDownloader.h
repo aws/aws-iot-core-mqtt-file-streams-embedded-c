@@ -25,42 +25,36 @@
  * These first few are topic extensions to the dynamic base topic that includes
  * the Thing name.
  */
-#define MQTT_API_THINGS                         "$aws/things/" /*!< Topic prefix for thing APIs. */
-#define MQTT_API_STREAMS                        "/streams/"    /*!< Stream API identifier. */
-#define MQTT_API_DATA_CBOR                      "/data/cbor"   /*!< Stream API suffix. */
-#define MQTT_API_GET_CBOR                       "/get/cbor"    /*!< Stream API suffix. */
-#define MQTT_API_DATA_JSON                      "/data/json"   /*!< JSON DATA Stream API suffix. */
-#define MQTT_API_GET_JSON                       "/get/json"    /*!< JSON GET Stream API suffix. */
+#define MQTT_API_THINGS                   "$aws/things/"       /*!< Topic prefix for thing APIs. */
+#define MQTT_API_STREAMS                  "/streams/"          /*!< Stream API identifier. */
+#define MQTT_API_DATA_CBOR                "/data/cbor"         /*!< Stream API suffix. */
+#define MQTT_API_GET_CBOR                 "/get/cbor"          /*!< Stream API suffix. */
+#define MQTT_API_DATA_JSON                "/data/json"         /*!< JSON DATA Stream API suffix. */
+#define MQTT_API_GET_JSON                 "/get/json"          /*!< JSON GET Stream API suffix. */
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Maximum stream name length.
  */
-#define STREAM_NAME_MAX_LEN                     44U
+#define STREAM_NAME_MAX_LEN               44U
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Length of NULL character. Used in calculating lengths of MQTT topics.
  */
-#define NULL_CHAR_LEN                           1U
+#define NULL_CHAR_LEN                     1U
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Maximum thing name length.
  */
-#define MAX_THINGNAME_LEN                       128U
+#define MAX_THINGNAME_LEN                 128U
 
 /**
  * @ingroup mqtt_file_downloader_const_types
  * Stream Request Buffer Size
  */
-#define GET_STREAM_REQUEST_BUFFER_SIZE          256U
-
-/**
- * @ingroup mqtt_file_downloader_const_types
- * @brief Configure the Maximum size of the data payload.
- */
-#define mqttFileDownloader_CONFIG_BLOCK_SIZE    256U
+#define GET_STREAM_REQUEST_BUFFER_SIZE    256U
 
 /**
  * @brief Macro to calculate string length.
