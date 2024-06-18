@@ -1,6 +1,7 @@
 {
   "name": "aws-iot-core-mqtt-file-streams-embedded-c",
   "releases": [
+    "v1.1.0",
     "v1.0.0"
   ],
   "branches": [
