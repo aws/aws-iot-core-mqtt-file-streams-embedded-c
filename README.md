@@ -4,6 +4,12 @@ In AWS IoT, a **stream** is a publicly addressable resource that is an abstracti
 
 More information about streams and MQTT based file delivery can be found [here](https://docs.aws.amazon.com/iot/latest/developerguide/mqtt-based-file-delivery.html)
 
+**AWS IoT MQTT File Streams library v1.1.0
+[source code](https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c/tree/v1.1.0/source)
+is part of the
+[FreeRTOS 202406.00 LTS](https://github.com/FreeRTOS/FreeRTOS-LTS/tree/202406.00-LTS)
+release.**
+
 ## MQTT File Streams Config File
 
 The MQTT file streams library exposes build configuration macros that are required for
