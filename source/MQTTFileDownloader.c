@@ -286,6 +286,8 @@ size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
                                                  uint32_t blockSize,
                                                  uint16_t blockOffset,
                                                  uint32_t numberOfBlocksRequested,
+                                                 const uint8_t * blockBitmap,
+                                                 size_t blockBitmapSize,
                                                  char * getStreamRequest,
                                                  size_t getStreamRequestLength )
 {
@@ -303,40 +305,18 @@ size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
 
         if( dataType == DATA_TYPE_JSON )
         {
-            /* MISRA Ref 21.6.1 [Use of snprintf] */
-            /* More details at: https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c//blob/main/MISRA.md#rule-216 */
-            /* coverity[misra_c_2012_rule_21_6_violation] */
-            ( void ) snprintf( getStreamRequest,
-                               GET_STREAM_REQUEST_BUFFER_SIZE,
-                               "{"
-                               "\"s\": 1,"
-                               "\"f\": %u,"
-                               "\"l\": %u,"
-                               "\"o\": %u,"
-                               "\"n\": %u"
-                               "}",
-                               fileId,
-                               blockSize,
-                               blockOffset,
-                               numberOfBlocksRequested );
-
-            requestLength = strnlen( getStreamRequest,
-                                     GET_STREAM_REQUEST_BUFFER_SIZE );
+            JSON_Encode_GetStreamRequestMessage();
         }
         else
         {
-            /* MISRA Ref 7.4.1 [Use of string literal] */
-            /* More details at: https://github.com/aws/aws-iot-core-mqtt-file-streams-embedded-c//blob/main/MISRA.md#rule-74 */
             ( void ) CBOR_Encode_GetStreamRequestMessage( ( uint8_t * ) getStreamRequest,
                                                           GET_STREAM_REQUEST_BUFFER_SIZE,
                                                           &requestLength,
-                                                          "rdy",
                                                           fileId,
                                                           blockSize,
                                                           blockOffset,
-                                                          /* coverity[misra_c_2012_rule_7_4_violation] */
-                                                          ( const uint8_t * ) "MQ==",
-                                                          strlen( "MQ==" ),
+                                                          blockBitmap,
+                                                          blockBitmapSize,
                                                           numberOfBlocksRequested );
         }
     }
