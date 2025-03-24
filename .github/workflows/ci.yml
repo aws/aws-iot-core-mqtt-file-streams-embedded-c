@@ -28,9 +28,9 @@ jobs:
       - name: Run Coverage
         run: |
           make -C build/ coverage
-          declare -a EXCLUDE=("\*test\*" "\*CMakeCCompilerId\*" "\*mocks\*" "\*vendor/unity\*" "\*_deps\*")
-          echo ${EXCLUDE[@]} | xargs lcov --rc branch_coverage=1 -r build/coverage.info -o build/coverage.info
-          lcov --rc branch_coverage=1 --list build/coverage.info
+          declare -a EXCLUDE=("\*_deps\*")
+          echo ${EXCLUDE[@]} | xargs lcov --rc lcov_branch_coverage=1 -r build/coverage.info -o build/coverage.info
+          lcov --rc lcov_branch_coverage=1 --summary build/coverage.info
       - name: Check Coverage
         uses: FreeRTOS/CI-CD-Github-Actions/coverage-cop@main
         with:
@@ -93,7 +93,7 @@ jobs:
       - name: Clone coreJSON
         run: git clone https://github.com/FreeRTOS/coreJSON.git --depth 1 --branch v3.2.0
       - name: Clone tinycbor
-        run: git clone https://github.com/intel/tinycbor.git --depth 1 --branch main 
+        run: git clone https://github.com/intel/tinycbor.git --depth 1 --branch main
       - name: Install Python3
         uses: actions/setup-python@v3
         with:
