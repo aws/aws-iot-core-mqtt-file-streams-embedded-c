@@ -71,6 +71,7 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
     CborParser parser;
     CborValue value, cborMap;
     size_t payloadSizeReceived = 0;
+    int variableBuffer = 0;
 
     if( ( fileId == NULL ) || ( blockId == NULL ) || ( blockSize == NULL ) ||
         ( payload == NULL ) || ( payloadSize == NULL ) ||
@@ -114,7 +115,9 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_value_get_int( &value, ( int32_t * ) fileId );
+        variableBuffer = ( int ) *fileId;
+        cborResult = cbor_value_get_int( &value, &variableBuffer );
+        *fileId = ( int32_t ) variableBuffer;
     }
 
     /* Find the block ID. */
@@ -132,7 +135,9 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_value_get_int( &value, ( int32_t * ) blockId );
+        variableBuffer = ( int ) *blockId;
+        cborResult = cbor_value_get_int( &value, &variableBuffer );
+        *blockId = ( int32_t ) variableBuffer;
     }
 
     /* Find the block size. */
@@ -150,7 +155,9 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        cborResult = cbor_value_get_int( &value, ( int32_t * ) blockSize );
+        variableBuffer = ( int ) *blockSize;
+        cborResult = cbor_value_get_int( &value, &variableBuffer );
+        *blockSize = ( int32_t ) variableBuffer;
     }
 
     /* Find the payload bytes. */
