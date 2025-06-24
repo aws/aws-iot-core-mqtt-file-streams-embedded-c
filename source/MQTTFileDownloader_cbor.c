@@ -20,7 +20,7 @@
 /**
  * @brief Number of keys in cbor get stream request message.
  */
-#define CBOR_GETSTREAMREQUEST_ITEM_COUNT    6
+#define CBOR_GETSTREAMREQUEST_ITEM_COUNT    5
 
 /* ========================================================================== */
 
@@ -220,7 +220,6 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
 bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
                                           size_t messageBufferSize,
                                           size_t * encodedMessageSize,
-                                          const char * clientToken,
                                           uint32_t fileId,
                                           uint32_t blockSize,
                                           uint32_t blockOffset,
@@ -230,12 +229,15 @@ bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
 {
     CborError cborResult = CborNoError;
     CborEncoder encoder, cborMapEncoder;
+    size_t payloadKeyCount = CBOR_GETSTREAMREQUEST_ITEM_COUNT;
 
-    if( ( messageBuffer == NULL ) || ( encodedMessageSize == NULL ) ||
-        ( clientToken == NULL ) || ( blockBitmap == NULL ) )
+    if( ( messageBuffer == NULL ) || ( encodedMessageSize == NULL ) )
     {
         cborResult = CborUnknownError;
     }
+
+    /* Adjust the map size based off the presense of optional tokens. */
+    payloadKeyCount -= ( blockBitmap == NULL || blockBitmapSize == 0 ) ? 1 : 0;
 
     /* Initialize the CBOR encoder. */
     if( CborNoError == cborResult )
@@ -243,21 +245,23 @@ bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
         cbor_encoder_init( &encoder, messageBuffer, messageBufferSize, 0 );
         cborResult = cbor_encoder_create_map( &encoder,
                                               &cborMapEncoder,
-                                              CBOR_GETSTREAMREQUEST_ITEM_COUNT );
+                                              payloadKeyCount);
     }
 
-    /* Encode the client token key and value. */
-    if( CborNoError == cborResult )
+    if ( clientToken != NULL )
     {
-        cborResult = cbor_encode_text_stringz( &cborMapEncoder,
-                                               OTA_CBOR_CLIENTTOKEN_KEY );
-    }
+        /* Encode the client token key and value. */
+        if( CborNoError == cborResult )
+        {
+            cborResult = cbor_encode_text_stringz( &cborMapEncoder,
+                                                OTA_CBOR_CLIENTTOKEN_KEY );
+        }
 
-    if( CborNoError == cborResult )
-    {
-        cborResult = cbor_encode_text_stringz( &cborMapEncoder, clientToken );
+        if( CborNoError == cborResult )
+        {
+            cborResult = cbor_encode_text_stringz( &cborMapEncoder, clientToken );
+        }
     }
-
     /* Encode the file ID key and value. */
     if( CborNoError == cborResult )
     {
@@ -294,20 +298,22 @@ bool CBOR_Encode_GetStreamRequestMessage( uint8_t * messageBuffer,
         cborResult = cbor_encode_int( &cborMapEncoder, ( int64_t ) blockOffset );
     }
 
-    /* Encode the block bitmap key and value. */
-    if( CborNoError == cborResult )
+    if ( blockBitmap != NULL && blockBitmapSize != 0 )
     {
-        cborResult = cbor_encode_text_stringz( &cborMapEncoder,
-                                               OTA_CBOR_BLOCKBITMAP_KEY );
-    }
+        /* Encode the block bitmap key and value. */
+        if( CborNoError == cborResult )
+        {
+            cborResult = cbor_encode_text_stringz( &cborMapEncoder,
+                                                OTA_CBOR_BLOCKBITMAP_KEY );
+        }
 
-    if( CborNoError == cborResult )
-    {
-        cborResult = cbor_encode_byte_string( &cborMapEncoder,
-                                              blockBitmap,
-                                              blockBitmapSize );
+        if( CborNoError == cborResult )
+        {
+            cborResult = cbor_encode_byte_string( &cborMapEncoder,
+                                                blockBitmap,
+                                                blockBitmapSize );
+        }
     }
-
     /* Encode the number of blocks requested key and value. */
     if( CborNoError == cborResult )
     {
