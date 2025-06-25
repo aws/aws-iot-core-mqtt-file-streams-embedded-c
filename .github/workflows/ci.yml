@@ -63,7 +63,7 @@ jobs:
         with:
           path: ./
   formatting:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Check formatting
@@ -93,7 +93,11 @@ jobs:
       - name: Clone coreJSON
         run: git clone https://github.com/FreeRTOS/coreJSON.git --depth 1 --branch v3.2.0
       - name: Clone tinycbor
-        run: git clone https://github.com/intel/tinycbor.git --depth 1 --branch main
+        run: |
+          git clone https://github.com/intel/tinycbor.git --depth 1 --branch main
+          cd tinycbor
+          cmake -B ./build -S .
+          cd ../
       - name: Install Python3
         uses: actions/setup-python@v3
         with:
