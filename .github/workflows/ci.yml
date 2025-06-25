@@ -94,10 +94,9 @@ jobs:
         run: git clone https://github.com/FreeRTOS/coreJSON.git --depth 1 --branch v3.2.0
       - name: Clone tinycbor
         run: |
-          git clone https://github.com/intel/tinycbor.git --depth 1 --branch main
+          git clone https://github.com/intel/tinycbor.git
           cd tinycbor
-          cmake -B ./build -S .
-          cd ../
+          git checkout 9924cfed3b95ad6de299ae675064430fdb886216
       - name: Install Python3
         uses: actions/setup-python@v3
         with:
