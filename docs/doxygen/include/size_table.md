@@ -14,7 +14,7 @@
     </tr>
     <tr>
         <td>MQTTFileDownloader_cbor.c</td>
-        <td><center>0.8K</center></td>
+        <td><center>0.7K</center></td>
         <td><center>0.6K</center></td>
     </tr>
     <tr>
@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <td>cborencoder.c</td>
-        <td><center>2.0K</center></td>
+        <td><center>2.1K</center></td>
         <td><center>0.7K</center></td>
     </tr>
     <tr>
