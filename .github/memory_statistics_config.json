@@ -12,8 +12,7 @@
     "include": [
         "source/include",
         "coreJSON/source/include",
-        "tinycbor/src",
-        "tinycbor/build"
+        "tinycbor/src"
     ],
     "compiler_flags": [
         "MQTT_STREAMS_DO_NOT_USE_CUSTOM_CONFIG"
