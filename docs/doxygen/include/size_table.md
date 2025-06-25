@@ -29,12 +29,12 @@
     </tr>
     <tr>
         <td>cborparser.c</td>
-        <td><center>2.8K</center></td>
-        <td><center>2.2K</center></td>
+        <td><center>1.9K</center></td>
+        <td><center>1.7K</center></td>
     </tr>
     <tr>
         <td>cborencoder.c</td>
-        <td><center>2.1K</center></td>
+        <td><center>1.7K</center></td>
         <td><center>0.7K</center></td>
     </tr>
     <tr>
@@ -44,7 +44,7 @@
     </tr>
     <tr>
         <td><b>Total estimates</b></td>
-        <td><b><center>10.3K</center></b></td>
-        <td><b><center>7.6K</center></b></td>
+        <td><b><center>9.0K</center></b></td>
+        <td><b><center>7.1K</center></b></td>
     </tr>
 </table>
