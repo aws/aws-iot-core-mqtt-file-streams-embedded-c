@@ -1,5 +1,5 @@
 /*
- * AWS IoT Core MQTT File Streams Embedded C v1.1.0
+ * AWS IoT Core MQTT File Streams Embedded C
  * Copyright (C) 2023 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT
  *
@@ -18,6 +18,16 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+/**
+ * @cond DOXYGEN_IGNORE
+ * The current version of this library.
+ *
+ * If MQTT_FILE_DOWNLOADER_LIBRARY_VERSION ends with + it represents the version in development
+ * after the numbered release.
+ */
+#define MQTT_FILE_DOWNLOADER_LIBRARY_VERSION    "v1.1.0+"
+/** @endcond */
 
 /**
  *  @brief Topic strings used by the MQTT downloader.
