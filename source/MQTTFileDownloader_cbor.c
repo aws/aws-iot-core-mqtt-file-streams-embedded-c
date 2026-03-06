@@ -1,5 +1,5 @@
 /*
- * AWS IoT Core MQTT File Streams Embedded C v1.1.0
+ * AWS IoT Core MQTT File Streams Embedded C
  * Copyright (C) 2023 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT
  *
@@ -71,6 +71,8 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
     CborParser parser;
     CborValue value, cborMap;
     size_t payloadSizeReceived = 0;
+    /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#dir-46 */
+    /* coverity[misra_c_2012_directive_4_6_violation] */
     int variableBuffer = 0;
 
     if( ( fileId == NULL ) || ( blockId == NULL ) || ( blockSize == NULL ) ||
@@ -115,9 +117,25 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        variableBuffer = ( int ) *fileId;
         cborResult = cbor_value_get_int( &value, &variableBuffer );
-        *fileId = ( int32_t ) variableBuffer;
+
+        if( cborResult == CborNoError )
+        {
+            /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
+            /* coverity[misra_c_2012_rule_14_3_violation] */
+            /* coverity[result_independent_of_operands] */
+            if( ( variableBuffer < INT32_MIN ) || ( variableBuffer > INT32_MAX ) )
+            {
+                /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
+                /* coverity[misra_c_2012_rule_14_3_violation] */
+                /* coverity[dead_error_line] */
+                cborResult = CborErrorDataTooLarge;
+            }
+            else
+            {
+                *fileId = ( int32_t ) variableBuffer;
+            }
+        }
     }
 
     /* Find the block ID. */
@@ -135,9 +153,25 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        variableBuffer = ( int ) *blockId;
         cborResult = cbor_value_get_int( &value, &variableBuffer );
-        *blockId = ( int32_t ) variableBuffer;
+
+        if( cborResult == CborNoError )
+        {
+            /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
+            /* coverity[misra_c_2012_rule_14_3_violation] */
+            /* coverity[result_independent_of_operands] */
+            if( ( variableBuffer < INT32_MIN ) || ( variableBuffer > INT32_MAX ) )
+            {
+                /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
+                /* coverity[misra_c_2012_rule_14_3_violation] */
+                /* coverity[dead_error_line] */
+                cborResult = CborErrorDataTooLarge;
+            }
+            else
+            {
+                *blockId = ( int32_t ) variableBuffer;
+            }
+        }
     }
 
     /* Find the block size. */
@@ -155,9 +189,25 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
 
     if( CborNoError == cborResult )
     {
-        variableBuffer = ( int ) *blockSize;
         cborResult = cbor_value_get_int( &value, &variableBuffer );
-        *blockSize = ( int32_t ) variableBuffer;
+
+        if( cborResult == CborNoError )
+        {
+            /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
+            /* coverity[misra_c_2012_rule_14_3_violation] */
+            /* coverity[result_independent_of_operands] */
+            if( ( variableBuffer < INT32_MIN ) || ( variableBuffer > INT32_MAX ) )
+            {
+                /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
+                /* coverity[misra_c_2012_rule_14_3_violation] */
+                /* coverity[dead_error_line] */
+                cborResult = CborErrorDataTooLarge;
+            }
+            else
+            {
+                *blockSize = ( int32_t ) variableBuffer;
+            }
+        }
     }
 
     /* Find the payload bytes. */
