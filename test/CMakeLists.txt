@@ -44,7 +44,7 @@ include(FetchContent)
 FetchContent_Declare(
   CMock
   GIT_REPOSITORY https://github.com/ThrowTheSwitch/CMock.git
-  GIT_TAG ed29ce388f4478bda1bdfb274d371e961b671c2b)
+  GIT_TAG f368744ca5a203baa273d8de909f694ffa9fed8c)
 
 FetchContent_Declare(
   tinycbor
