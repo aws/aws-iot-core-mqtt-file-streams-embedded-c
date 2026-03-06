@@ -118,6 +118,7 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
     if( CborNoError == cborResult )
     {
         cborResult = cbor_value_get_int( &value, &variableBuffer );
+
         if( cborResult == CborNoError )
         {
             /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
@@ -153,6 +154,7 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
     if( CborNoError == cborResult )
     {
         cborResult = cbor_value_get_int( &value, &variableBuffer );
+
         if( cborResult == CborNoError )
         {
             /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
@@ -188,6 +190,7 @@ bool CBOR_Decode_GetStreamResponseMessage( const uint8_t * messageBuffer,
     if( CborNoError == cborResult )
     {
         cborResult = cbor_value_get_int( &value, &variableBuffer );
+
         if( cborResult == CborNoError )
         {
             /* More details at: https://github.com/FreeRTOS/coreMQTT/blob/main/MISRA.md#rule-143 */
