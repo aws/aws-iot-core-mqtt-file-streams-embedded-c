@@ -31,7 +31,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">MQTT File Streams Downloader<span id="projectnumber">&#160;v1.1.0</span>
+   <div id="projectname">MQTT File Streams Downloader<span id="projectnumber">&#160;v1.2.0</span>
    </div>
    <div id="projectbrief">MQTT file streams downloader library</div>
   </td>
@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('_m_q_t_t_file_downloader__cbor_8h_sour
 </div><!--header-->
 <div class="contents">
 <a href="_m_q_t_t_file_downloader__cbor_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="comment">/*</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * AWS IoT Core MQTT File Streams Embedded C v1.1.0</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment"> * AWS IoT Core MQTT File Streams Embedded C</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment"> * Copyright (C) 2023 Amazon.com, Inc. and its affiliates. All Rights Reserved.</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment"> * SPDX-License-Identifier: MIT</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment"> *</span></div>
@@ -161,7 +161,7 @@ $(document).ready(function(){initNavTree('_m_q_t_t_file_downloader__cbor_8h_sour
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#endif </span><span class="comment">/* ifndef MQTT_FILE_DOWNLOADER_CBOR_H */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="a_m_q_t_t_file_downloader__cbor_8h_html_a46abcf08a2ff25f1ab6e652a6981595a"><div class="ttname"><a href="_m_q_t_t_file_downloader__cbor_8h.html#a46abcf08a2ff25f1ab6e652a6981595a">CBOR_Decode_GetStreamResponseMessage</a></div><div class="ttdeci">bool CBOR_Decode_GetStreamResponseMessage(const uint8_t *messageBuffer, size_t messageSize, int32_t *fileId, int32_t *blockId, int32_t *blockSize, uint8_t *const *payload, size_t *payloadSize)</div><div class="ttdoc">Decode a Get Stream response message from AWS IoT OTA.</div><div class="ttdef"><b>Definition:</b> MQTTFileDownloader_cbor.c:62</div></div>
-<div class="ttc" id="a_m_q_t_t_file_downloader__cbor_8h_html_a5bfb5c4675666ca758692eabd896e434"><div class="ttname"><a href="_m_q_t_t_file_downloader__cbor_8h.html#a5bfb5c4675666ca758692eabd896e434">CBOR_Encode_GetStreamRequestMessage</a></div><div class="ttdeci">bool CBOR_Encode_GetStreamRequestMessage(uint8_t *messageBuffer, size_t messageBufferSize, size_t *encodedMessageSize, const char *clientToken, uint32_t fileId, uint32_t blockSize, uint32_t blockOffset, const uint8_t *blockBitmap, size_t blockBitmapSize, uint32_t numOfBlocksRequested)</div><div class="ttdoc">Create an encoded Get Stream Request message for the AWS IoT OTA service. The service allows block co...</div><div class="ttdef"><b>Definition:</b> MQTTFileDownloader_cbor.c:220</div></div>
+<div class="ttc" id="a_m_q_t_t_file_downloader__cbor_8h_html_a5bfb5c4675666ca758692eabd896e434"><div class="ttname"><a href="_m_q_t_t_file_downloader__cbor_8h.html#a5bfb5c4675666ca758692eabd896e434">CBOR_Encode_GetStreamRequestMessage</a></div><div class="ttdeci">bool CBOR_Encode_GetStreamRequestMessage(uint8_t *messageBuffer, size_t messageBufferSize, size_t *encodedMessageSize, const char *clientToken, uint32_t fileId, uint32_t blockSize, uint32_t blockOffset, const uint8_t *blockBitmap, size_t blockBitmapSize, uint32_t numOfBlocksRequested)</div><div class="ttdoc">Create an encoded Get Stream Request message for the AWS IoT OTA service. The service allows block co...</div><div class="ttdef"><b>Definition:</b> MQTTFileDownloader_cbor.c:277</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
