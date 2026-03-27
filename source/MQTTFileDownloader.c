@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "MQTTFileDownloader.h"
 #include "MQTTFileDownloader_defaults.h"
@@ -311,9 +312,9 @@ size_t mqttDownloader_createGetDataBlockRequest( DataType_t dataType,
                                "{"
                                "\"s\": 1,"
                                "\"f\": %u,"
-                               "\"l\": %u,"
+                               "\"l\": %"PRIu32","
                                "\"o\": %u,"
-                               "\"n\": %u"
+                               "\"n\": %"PRIu32
                                "}",
                                fileId,
                                blockSize,
